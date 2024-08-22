@@ -1,15 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './output.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import '@radix-ui/themes/styles.css';
+import { Authenticator } from '@aws-amplify/ui-react';
+import { Amplify } from 'aws-amplify';
+import config from './amplifyconfiguration.json';
+
+Amplify.configure(config);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+            <Authenticator.Provider>
+            <App />
+        </Authenticator.Provider>
   </React.StrictMode>
 );
 
