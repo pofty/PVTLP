@@ -4,6 +4,7 @@ import {Button, Theme, Text, Flex} from '@radix-ui/themes';
 import Auth from "./lib/Auth";
 import NavBar from "./components/NavBar";
 import TransactionsTable from "./tables/TransactionsTable";
+import Example from "src/forms/CreateTransaction"
 
 function App() {
     const [userName, setUserName] = React.useState<string | undefined>(undefined);
@@ -12,6 +13,7 @@ function App() {
         <>
             <Theme accentColor="violet">
                 <NavBar userName={userName} setUserName={setUserName}/>
+                <Example/>
                 <Auth setUserName={setUserName}/>
                 <h1>App</h1>
                     <TransactionsTable/>
