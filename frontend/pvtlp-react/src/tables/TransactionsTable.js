@@ -1,7 +1,9 @@
-import {Button, Flex, Table, Theme} from "@radix-ui/themes";
+import {Button, Flex, IconButton, Table, Theme} from "@radix-ui/themes";
 import * as React from "react";
 import {columns, transactions} from "./data.js";
 import {BackgroundGradient} from "../components/background-gradient";
+import { Pencil1Icon as EditIcon } from '@radix-ui/react-icons'
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 export default function TransactionsTable() {
     function GetHeaderCell({headerName}) {
@@ -19,7 +21,7 @@ export default function TransactionsTable() {
                 <GetCell cellValue={transaction.amount}/>
                 <GetCell cellValue={transaction.currency}/>
                 <GetCell cellValue={transaction.paymentMethod}/>
-                <GetCell cellValue={transaction.actions}/>
+                <ActionsCell />
             </Table.Row>
         );
     }
@@ -27,6 +29,21 @@ export default function TransactionsTable() {
     function GetCell({cellValue}) {
         return <Table.Cell align="center" className="text-white">{cellValue}</Table.Cell>;
     }
+
+function ActionsCell() {
+    return (
+        <Flex align="center" justify="center" gap="1">
+    <IconButton radius="full" color="orange" size="2">
+        <EditIcon className=" h-6 w-6 text-white hover:scale-125 transition-transform duration-200" />
+         </IconButton>
+
+    <IconButton radius="full" color="red" size="2">
+        <TrashIcon className="h-6 w-6 text-white hover:scale-125 transition-transform duration-200" />
+         </IconButton>
+        </Flex>
+
+    );
+}
 
     return (
         <Flex direction="column">
