@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './output.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import '@radix-ui/themes/styles.css';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
 import config from './amplifyconfiguration.json';
+import {NextUIProvider} from "@nextui-org/react";
+import './output.css';
 
 Amplify.configure(config);
 
@@ -16,7 +17,10 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
             <Authenticator.Provider>
+                    <NextUIProvider>
+
             <App />
+                        </NextUIProvider>
 
         </Authenticator.Provider>
   </React.StrictMode>

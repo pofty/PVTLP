@@ -4,7 +4,8 @@ import {Button, Theme, Text, Flex} from '@radix-ui/themes';
 import Auth from "./lib/Auth";
 import NavBar from "./components/NavBar";
 import TransactionsTable from "./tables/TransactionsTable";
-import Example from "src/forms/CreateTransaction"
+import Example from "src/forms/CreateTransaction";
+import TransactionsTable2 from "./tables/TransactionsTable2";
 
 function App() {
     const [userName, setUserName] = React.useState<string | undefined>(undefined);
@@ -13,10 +14,16 @@ function App() {
         <>
             <Theme accentColor="violet">
                 <NavBar userName={userName} setUserName={setUserName}/>
-                <Example/>
+                <br/>
+                <br/>
+
+                <TransactionsTable2/>
+
+
+                {/*<Example/>*/}
                 <Auth setUserName={setUserName}/>
                 <h1>App</h1>
-                    <TransactionsTable/>
+                {/*<TransactionsTable/>*/}
                 <br/>
                 <div className="text-center bg-center bg-black text-white p-4">
                     <h1 className="text-2xl">Tailwind is working!</h1>

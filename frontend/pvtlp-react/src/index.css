@@ -1,9 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10..0,100..900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 body {
   margin: 0;
@@ -29,9 +26,4 @@ code {
   --amplify-components-tabs-item-color: var(--amplify-colors-neutral-80);
   --amplify-components-tabs-item-active-color: var(--amplify-colors-purple-100);
   --amplify-components-button-link-color: var(--amplify-colors-purple-80);
-}
-
-/* editing radix accentColor theme */
-.RadixButtonRoot--accent {
-  --accentColor: var(--amplify-colors-purple-60);
 }
