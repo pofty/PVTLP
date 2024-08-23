@@ -1,149 +1,45 @@
 const columns = [
-    {name: "Transaction Id"},
-    {name: "Transaction Status"},
-    {name: "Timestamp"},
-    {name: "Customer"},
-    {name: "Number of Attempts"},
-    {name: "MFA Status"},
-    {name: "Title"},
-    {name: "Amount"},
-    {name: "Country"},
-    {name: "Currency"},
-    {name: "payment Method"},
-    {name: "Actions"},
+    {name: "Transaction Id", uid: "transaction_id_pk"},
+    {name: "Transaction Status", uid: "transaction_status_fk"},
+    {name: "Timestamp", uid: "timestamp"},
+    {name: "Customer", uid: "customer_id_fk"},
+    {name: "Number of Attempts", uid: "number_of_attempts"},
+    {name: "MFA Status", uid: "mfa_status_fk"},
+    {name: "Title", uid: "title_id_fk"},
+    {name: "Amount", uid: "amount"},
+    {name: "Country", uid: "country_code_fk"},
+    {name: "Currency", uid: "currency_code_fk"},
+    {name: "Payment Method", uid: "payment_method_fk"},
+    {name: "Actions", uid: "actions"},
 ];
 
-const transactions = [
-    {
-        transactionId: "TXN001",
-        transactionStatus: "Completed",
-        timestamp: "2023-08-21T10:30:00Z",
-        customer: "John Doe",
-        numberOfAttempts: 3,
-        mfaStatus: "Grandfathered",
-        title: "Harry Potter and the Philosopher's Stone",
-        amount: 250.75,
-        country: "USA",
-        currency: "USD",
-        paymentMethod: "Credit Card",
-    },
-    {
-        transactionId: "TXN002",
-        transactionStatus: "Pending",
-        timestamp: "2023-08-22T11:00:00Z",
-        customer: "Jane Smith",
-        numberOfAttempts: 1,
-        mfaStatus: "Enabled",
-        title: "The Great Gatsby",
-        amount: 150.50,
-        country: "Canada",
-        currency: "CAD",
-        paymentMethod: "Debit Card",
-    },
-    {
-        transactionId: "TXN003",
-        transactionStatus: "Failed",
-        timestamp: "2023-08-23T12:15:00Z",
-        customer: "Alice Johnson",
-        numberOfAttempts: 2,
-        mfaStatus: "Disabled",
-        title: "1984",
-        amount: 75.00,
-        country: "UK",
-        currency: "GBP",
-        paymentMethod: "PayPal",
-    },
-    {
-        transactionId: "TXN004",
-        transactionStatus: "Completed",
-        timestamp: "2023-08-24T13:45:00Z",
-        customer: "Bob Brown",
-        numberOfAttempts: 4,
-        mfaStatus: "Enabled",
-        title: "To Kill a Mockingbird",
-        amount: 200.00,
-        country: "Australia",
-        currency: "AUD",
-        paymentMethod: "Credit Card",
-    },
-    {
-        transactionId: "TXN005",
-        transactionStatus: "Pending",
-        timestamp: "2023-08-25T14:30:00Z",
-        customer: "Charlie Davis",
-        numberOfAttempts: 1,
-        mfaStatus: "Grandfathered",
-        title: "The Catcher in the Rye",
-        amount: 120.25,
-        country: "New Zealand",
-        currency: "NZD",
-        paymentMethod: "Bank Transfer",
-    },
-    {
-        transactionId: "TXN006",
-        transactionStatus: "Failed",
-        timestamp: "2023-08-26T15:00:00Z",
-        customer: "Diana Evans",
-        numberOfAttempts: 3,
-        mfaStatus: "Disabled",
-        title: "Pride and Prejudice",
-        amount: 180.75,
-        country: "India",
-        currency: "INR",
-        paymentMethod: "Credit Card",
-    },
-    {
-        transactionId: "TXN007",
-        transactionStatus: "Completed",
-        timestamp: "2023-08-27T16:20:00Z",
-        customer: "Evan Foster",
-        numberOfAttempts: 2,
-        mfaStatus: "Enabled",
-        title: "The Hobbit",
-        amount: 220.00,
-        country: "South Africa",
-        currency: "ZAR",
-        paymentMethod: "Debit Card",
-    },
-    {
-        transactionId: "TXN008",
-        transactionStatus: "Pending",
-        timestamp: "2023-08-28T17:10:00Z",
-        customer: "Fiona Green",
-        numberOfAttempts: 1,
-        mfaStatus: "Grandfathered",
-        title: "Moby Dick",
-        amount: 140.50,
-        country: "Germany",
-        currency: "EUR",
-        paymentMethod: "PayPal",
-    },
-    {
-        transactionId: "TXN009",
-        transactionStatus: "Failed",
-        timestamp: "2023-08-29T18:05:00Z",
-        customer: "George Harris",
-        numberOfAttempts: 3,
-        mfaStatus: "Disabled",
-        title: "War and Peace",
-        amount: 300.00,
-        country: "France",
-        currency: "EUR",
-        paymentMethod: "Bank Transfer",
-    },
-    {
-        transactionId: "TXN010",
-        transactionStatus: "Completed",
-        timestamp: "2023-08-30T19:00:00Z",
-        customer: "Hannah Irving",
-        numberOfAttempts: 2,
-        mfaStatus: "Enabled",
-        title: "The Odyssey",
-        amount: 260.75,
-        country: "Japan",
-        currency: "JPY",
-        paymentMethod: "Credit Card",
+export class Transaction {
+    constructor(transaction_id_pk, number_of_attempts, timestamp, mfa_status_fk, transaction_status_fk, customer_id_fk, title_id_fk, currency_code_fk, country_code_fk, payment_method_fk, amount) {
+        this.transaction_id_pk = transaction_id_pk;
+        this.number_of_attempts = number_of_attempts;
+        this.timestamp = timestamp;
+        this.mfa_status_fk = mfa_status_fk;
+        this.transaction_status_fk = transaction_status_fk;
+        this.customer_id_fk = customer_id_fk;
+        this.title_id_fk = title_id_fk;
+        this.currency_code_fk = currency_code_fk;
+        this.country_code_fk = country_code_fk;
+        this.payment_method_fk = payment_method_fk;
+        this.amount = amount;
     }
-];
+}
 
-export {columns, transactions};
+export const transactions01 = [
+    new Transaction("355bf501-ffea-4f5a-a9e2-16074de6fcf2", 3, "2023-08-21T10:30:00Z", "Grandfathered", "Completed", "355bf501-ffea-4f5a-a9e2-16074de6fcf2", "Harry Potter and the Philosopher's Stone", "USD", "USA", "Credit Card", 250.75),
+    ];
+
+const customers = [
+    {
+        Id: "355bf501-ffea-4f5a-a9e2-16074de6fcf2",
+        firstName: "Hasan",
+        lastName: "Wazzan",
+        homeRegion: "GBR"
+    }
+]
+
+export {columns, customers};
