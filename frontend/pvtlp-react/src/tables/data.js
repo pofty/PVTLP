@@ -29,17 +29,17 @@ export class Transaction {
     }
 }
 
+export class Customer {
+    constructor(customer_id_pk, first_name, last_name, note, home_country_code_fk) {
+        this.customer_id_pk = customer_id_pk;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.note = note;
+        this.home_country_code_fk = home_country_code_fk;
+    }
+}
 export const transactions01 = [
     new Transaction("355bf501-ffea-4f5a-a9e2-16074de6fcf2", 3, "2023-08-21T10:30:00Z", "Grandfathered", "Completed", "355bf501-ffea-4f5a-a9e2-16074de6fcf2", "Harry Potter and the Philosopher's Stone", "USD", "USA", "Credit Card", 250.75),
     ];
 
-const customers = [
-    {
-        Id: "355bf501-ffea-4f5a-a9e2-16074de6fcf2",
-        firstName: "Hasan",
-        lastName: "Wazzan",
-        homeRegion: "GBR"
-    }
-]
-
-export {columns, customers};
+export {columns};

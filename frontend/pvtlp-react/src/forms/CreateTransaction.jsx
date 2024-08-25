@@ -1,53 +1,12 @@
-import { useState } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import React, { useState, useEffect } from 'react';
 import { Field, Label, Switch } from '@headlessui/react';
-
-function Background() {
-  return (
-    <div
-      aria-hidden="true"
-      className="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]"
-    >
-      <div
-        style={{
-          clipPath:
-            'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-        }}
-        className="relative left-1/2 -z-10 aspect-[1155/678] w-[36.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]"
-      />
-    </div>
-  );
-}
-
-function Header() {
-  return (
-    <div className="mx-auto max-w-2xl text-center">
-      <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Create Transaction</h2>
-      <p className="mt-2 text-lg leading-8 text-gray-600">
-        Create a transaction record in Prime Video Transaction Ledger Portal
-      </p>
-    </div>
-  );
-}
-
-function MessageField() {
-  return (
-    <div className="sm:col-span-2">
-      <label htmlFor="message" className="block text-sm font-semibold leading-6 text-gray-900">
-        Message
-      </label>
-      <div className="mt-2.5">
-        <textarea
-          id="message"
-          name="message"
-          rows={4}
-          className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          defaultValue={''}
-        />
-      </div>
-    </div>
-  );
-}
+import { getCustomers, getTransactions } from '../utils/api_call_backend';
+import { ISO_4217_CURRENCIES, COUNTRIES } from '../utils/constants';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
+import {FlipWords} from "../components/FlipWordsDemo";
 
 function AgreementField({ agreed, setAgreed }) {
   return (
@@ -65,14 +24,24 @@ function AgreementField({ agreed, setAgreed }) {
           />
         </Switch>
       </div>
-      <Label className="text-sm leading-6 text-gray-600">
+      <p className="text-sm leading-6 text-gray-600">
         By selecting this, you agree to our{' '}
-        <a href="#" className="font-semibold text-indigo-600">
-          privacy&nbsp;policy
+        <a href="https://www.primevideo.com/help?nodeId=202095490&view-type=content-only" target="_blank" className="font-semibold text-indigo-600">
+          Prime Video Terms and Conditions
         </a>
         .
-      </Label>
+      </p>
     </Field>
+  );
+}
+
+function Header() {
+  return (
+    <div className="mx-auto max-w-2xl text-center">
+      <p className="mt-2 text-lg leading-8 text-gray-600">
+        Create a transaction record in Prime Video Transaction Ledger Portal
+      </p>
+    </div>
   );
 }
 
@@ -89,19 +58,217 @@ function SubmitButton() {
   );
 }
 
-function Form({ agreed, setAgreed }) {
+function Form({ agreed, setAgreed, customers, titles }) {
+  const [numberOfAttempts, setNumberOfAttempts] = useState(1);
+  const [timestamp, setTimestamp] = useState(new Date());
+  const [mfaStatus, setMfaStatus] = useState('');
+  const [transactionStatus, setTransactionStatus] = useState('');
+  const [customerId, setCustomerId] = useState(null);
+  const [titleId, setTitleId] = useState(null);
+  const [currencyCode, setCurrencyCode] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [amount, setAmount] = useState(1);
+
+  const mfaStatusOptions = [
+    { value: 'Grandfathered', label: 'Grandfathered' },
+    { value: 'Exempted', label: 'Exempted' },
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Cancelled', label: 'Cancelled' },
+  ];
+
+  const transactionStatusOptions = [
+    { value: 'Failed', label: 'Failed' },
+    { value: 'Grandfathered', label: 'Grandfathered' },
+    { value: 'Exempted', label: 'Exempted' },
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Cancelled', label: 'Cancelled' },
+  ];
+
+  const paymentMethodOptions = [
+    { value: 'Credit Card', label: 'Credit Card' },
+    { value: 'PayPal', label: 'PayPal' },
+    { value: 'Debit Card', label: 'Debit Card' },
+    { value: 'Bank Transfer', label: 'Bank Transfer' },
+  ];
+
+  const loadCustomerOptions = async (inputValue) => {
+    const customers = await getCustomers();
+    return customers.map((customer) => ({
+      value: customer.customer_id_pk,
+      label: `${customer.first_name} ${customer.last_name}`,
+    }));
+  };
+
+  const loadTitleOptions = async (inputValue) => {
+    const titles = await getTransactions();
+    return titles.map((title) => ({
+      value: title.title_id_fk,
+      label: title.title_id_fk,
+    }));
+  };
+
   return (
-    <form action="#" method="POST" className="mx-auto mt-16 max-w-xl sm:mt-20">
+    <form action="#" method="POST" className="mx-auto mt-8 max-w-xl">
       <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-        <InputField id="transaction-id" label="Transaction Id" />
-        <InputField id="transaction-status" label="Transaction Status" />
-        <InputField id="timestamp" label="Timestamp" type="datetime-local" />
-        <InputField id="name" label="Customer" autoComplete="name" />
-        <InputField id="mfa-status" label="MFA Status" />
-        <InputField id="amount" label="Amount" type="number" />
-        <CurrencyField />
-        <PaymentMethodField />
-        <MessageField />
+        <div>
+          <label htmlFor="number-of-attempts" className="block text-sm font-semibold leading-6 text-gray-900">
+            Number of Attempts
+          </label>
+          <div className="mt-2.5">
+            <input
+              id="number-of-attempts"
+              name="number-of-attempts"
+              type="number"
+              min="1"
+              max="10"
+              value={numberOfAttempts}
+              onChange={(e) => setNumberOfAttempts(e.target.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="timestamp" className="block text-sm font-semibold leading-6 text-gray-900">
+            Timestamp
+          </label>
+          <div className="mt-2.5">
+            <DatePicker
+              selected={timestamp}
+              onChange={(date) => setTimestamp(date)}
+              showTimeSelect
+              dateFormat="Pp"
+              minDate={new Date('2010-01-01')}
+              maxDate={new Date()}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+            <button type="button" onClick={() => setTimestamp(new Date())} className="mt-2 text-indigo-600">
+              Now
+            </button>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="mfa-status" className="block text-sm font-semibold leading-6 text-gray-900">
+            MFA Status
+          </label>
+          <div className="mt-2.5">
+            <Select
+              id="mfa-status"
+              name="mfa-status"
+              options={mfaStatusOptions}
+              value={mfaStatusOptions.find((option) => option.value === mfaStatus)}
+              onChange={(option) => setMfaStatus(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="transaction-status" className="block text-sm font-semibold leading-6 text-gray-900">
+            Transaction Status
+          </label>
+          <div className="mt-2.5">
+            <Select
+              id="transaction-status"
+              name="transaction-status"
+              options={transactionStatusOptions}
+              value={transactionStatusOptions.find((option) => option.value === transactionStatus)}
+              onChange={(option) => setTransactionStatus(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="customer-id" className="block text-sm font-semibold leading-6 text-gray-900">
+            Customer
+          </label>
+          <div className="mt-2.5">
+            <AsyncSelect
+              id="customer-id"
+              name="customer-id"
+              loadOptions={loadCustomerOptions}
+              value={customerId}
+              onChange={(option) => setCustomerId(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="title-id" className="block text-sm font-semibold leading-6 text-gray-900">
+            Title
+          </label>
+          <div className="mt-2.5">
+            <AsyncSelect
+              id="title-id"
+              name="title-id"
+              loadOptions={loadTitleOptions}
+              value={titleId}
+              onChange={(option) => setTitleId(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="currency-code" className="block text-sm font-semibold leading-6 text-gray-900">
+            Currency
+          </label>
+          <div className="mt-2.5">
+            <Select
+              id="currency-code"
+              name="currency-code"
+              options={ISO_4217_CURRENCIES}
+              value={ISO_4217_CURRENCIES.find((option) => option.value === currencyCode)}
+              onChange={(option) => setCurrencyCode(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="country-code" className="block text-sm font-semibold leading-6 text-gray-900">
+            Country
+          </label>
+          <div className="mt-2.5">
+            <Select
+              id="country-code"
+              name="country-code"
+              options={COUNTRIES}
+              value={COUNTRIES.find((option) => option.value === countryCode)}
+              onChange={(option) => setCountryCode(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="payment-method" className="block text-sm font-semibold leading-6 text-gray-900">
+            Payment Method
+          </label>
+          <div className="mt-2.5">
+            <Select
+              id="payment-method"
+              name="payment-method"
+              options={paymentMethodOptions}
+              value={paymentMethodOptions.find((option) => option.value === paymentMethod)}
+              onChange={(option) => setPaymentMethod(option.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="amount" className="block text-sm font-semibold leading-6 text-gray-900">
+            Amount
+          </label>
+          <div className="mt-2.5">
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              min="1"
+              max="200"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
         <AgreementField agreed={agreed} setAgreed={setAgreed} />
       </div>
       <SubmitButton />
@@ -109,78 +276,28 @@ function Form({ agreed, setAgreed }) {
   );
 }
 
-export default function Example() {
+export default function CreateTransaction() {
   const [agreed, setAgreed] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [titles, setTitles] = useState([]);
+
+  useEffect(() => {
+    getCustomers().then(setCustomers);
+    getTransactions().then(setTitles);
+  }, []);
 
   return (
-    <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
-      <Background />
-      <Header />
-      <Form agreed={agreed} setAgreed={setAgreed} />
-    </div>
-  );
-}
+      <div className="isolate bg-white ">
+          <div className=" flex justify-center items-center px-8">
+              <div className="text-5xl mx-auto font-normal text-blue-500 font-bold">
+                  Prime Video
+                  <FlipWords words={["Movies", "Shows", "Live Sport"]}/> <br/>
+              </div>
 
-function InputField({ id, label, type = "text", autoComplete, className = "" }) {
-  return (
-    <div className={className}>
-      <label htmlFor={id} className="block text-sm font-semibold leading-6 text-gray-900">
-        {label}
-      </label>
-      <div className="mt-2.5">
-        <input
-          id={id}
-          name={id}
-          type={type}
-          autoComplete={autoComplete}
-          className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        />
+
+          </div>
+          <Header/>
+          <Form agreed={agreed} setAgreed={setAgreed} customers={customers} titles={titles}/>
       </div>
-    </div>
-  );
-}
-
-function CurrencyField() {
-  return (
-    <div className="sm:col-span-2">
-      <label htmlFor="currency" className="block text-sm font-semibold leading-6 text-gray-900">
-        Currency
-      </label>
-      <div className="relative mt-2.5">
-        <select
-          id="currency"
-          name="currency"
-          className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        >
-          <option>USD</option>
-          <option>EUR</option>
-          <option>GBP</option>
-          <option>CAD</option>
-          <option>AUD</option>
-        </select>
-      </div>
-    </div>
-  );
-}
-
-function PaymentMethodField() {
-  return (
-    <div className="sm:col-span-2">
-      <label htmlFor="payment-method" className="block text-sm font-semibold leading-6 text-gray-900">
-        Payment Method
-      </label>
-      <div className="relative mt-2.5">
-        <select
-          id="payment-method"
-          name="payment-method"
-          className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        >
-          <option>Credit Card</option>
-          <option>PayPal</option>
-          <option>Debit Card</option>
-          <option>Bank Transfer</option>
-        </select>
-      </div>
-    </div>
   );
 }

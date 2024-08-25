@@ -1,3 +1,10 @@
+### Manually created
+backend/data/*
+
+
+
+
+### Auto Created by IDE
 ### Amplify template
 # AWS Amplify
 amplify/\#current-cloud-backend

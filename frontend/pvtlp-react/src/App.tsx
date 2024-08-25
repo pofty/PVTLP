@@ -3,9 +3,10 @@ import logo from './logo.svg';
 import {Button, Theme, Text, Flex} from '@radix-ui/themes';
 import Auth from "./lib/Auth";
 import NavBar from "./components/NavBar";
-import TransactionsTable from "./tables/TransactionsTable";
 import Example from "src/forms/CreateTransaction";
-import TransactionsTable2 from "./tables/TransactionsTable2";
+import TransactionsTable from "./tables/TransactionsTable";
+import CreateTransaction from "src/forms/CreateTransaction";
+import {FlipWords} from "./components/FlipWordsDemo";
 
 function App() {
     const [userName, setUserName] = React.useState<string | undefined>(undefined);
@@ -17,7 +18,8 @@ function App() {
                 <br/>
                 <br/>
 
-                <TransactionsTable2/>
+                {/*<TransactionsTable/>*/}
+                <CreateTransaction/>
 
 
                 {/*<Example/>*/}
@@ -40,5 +42,4 @@ function App() {
         </>
     );
 }
-
 export default App;
