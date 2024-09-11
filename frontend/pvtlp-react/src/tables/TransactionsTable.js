@@ -1,18 +1,39 @@
 import React, {useEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
-import {columns, Customer, transactions01} from "./data";
+import {columns, Customer, Title} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
 import {Flex, Box, IconButton, Badge} from "@radix-ui/themes";
 import {Pencil1Icon as EditIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
-import {getCustomers, getTransactions} from "../utils/api_call_backend";
+import {getCustomers, getTransactions, getTitles} from "../utils/api_call_backend";
 import Flag from "react-world-flags";
-import { Divider } from '@aws-amplify/ui-react';
 
+
+    export function getCountryCell(value) {
+        return (
+            <Flag className="rounded border-1 " code={value} height="10" width="35"/>
+        );
+    }
+
+
+export function getStatusBadge(value) {
+    const status_to_color = {
+        "Successful": "green",
+        "Failed": "red",
+        "Grandfathered": "blue",
+        "Exempted": "blue",
+        "Pending": "orange",
+        "Cancelled": "red"
+    };
+    return (
+        <Badge color={status_to_color[value]}>{value}</Badge>
+    );
+}
 
 export default function TransactionsTable() {
     const [page, setPage] = React.useState(1);
     const [data, setData] = useState([]);
+    const [titles, setTitles] = useState([]);
     const [customers, setCustomers] = useState([Customer, ]);
 
     useEffect(() => {
@@ -31,6 +52,13 @@ export default function TransactionsTable() {
             }).catch((error) => {
             console.error("Error fetching customers: ", error);
         });
+        getTitles()
+            .then((titles) => {
+                setTitles(titles);
+                console.log("titles: " + titles);
+            }).catch((error) => {
+            console.error("Error fetching titles: ", error);
+        });
     }, []);
 
     const rowsPerPage = 4;
@@ -44,62 +72,56 @@ export default function TransactionsTable() {
         return data.slice(start, end);
     }, [page, data]);
 
+    function getCustomerCell(value) {
+        const customer = customers.find(c => c.customer_id_pk === value);
+        return customer ? (
+            <Flex gap="3" justify="start">
+                <div>
+                    <div className="bg-white">
+                        {`${customer.first_name} ${customer.last_name}`}
+                    </div>
+                    <div className="text-gray-500"> Home Region: {customer.home_country_code_fk}</div>
+                    <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>
+                </div>
+            </Flex>
+        ) : value;
+    }
+
+    function getTitleCell(value) {
+        const title = titles.find(title => title.title_id_pk === value);
+        console.log("title: GG" + title);
+        return title ? (
+            <Flex gap="3" justify="start">
+                <div>
+                    <div className="bg-white">
+                        {`${title.name}`}
+                    </div>
+                    <div className="text-gray-500">
+                        ID: {title.title_id_pk}
+                    </div>
+                </div>
+            </Flex>
+        ) : value;
+    }
+
+
     function getTableCell(key, value) {
         if (value === undefined) {
             console.error(`No key found for item with key: ${key}`);
             return <div>Key not found</div>;
         }
 
-        function getCustomerCell() {
-            return (() => {
-                const customer = customers.find(c => c.customer_id_pk === value);
-                return customer ? (
-                    <Flex gap="3" justify="start">
-                        <div>
-                            <div className="bg-white">
-                                {`${customer.first_name} ${customer.last_name}`}
-                            </div>
-                            <div className="text-gray-500"> Home Region: {customer.home_country_code_fk}</div>
-                            <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>
-                        </div>
-                    </Flex>
-                ) : value;
-            })();
-        }
-
-        function getCountryCell(value) {
-            return (
-                    <Flag className="rounded border-1 " code={value} height="10" width="35"/>
-            );
-        }
-
-        function getStatusBadge(value) {
-            const status_to_color = {
-                "Successful": "green",
-                "Failed": "red",
-                "Grandfathered": "blue",
-                "Exempted": "blue",
-                "Pending": "orange",
-                "Cancelled": "red"
-            };
-            return (
-        <Badge color={status_to_color[value]}>{value}</Badge>
-            );
-        }
-
         return <>
-            {key === "customer_id_fk" ? getCustomerCell() : key === "country_code_fk" ? getCountryCell(value) : key === "mfa_status_fk" ? getStatusBadge(value) : key === "transaction_status_fk" ? getStatusBadge(value) : value}
+            {key === "customer_id_fk" ? getCustomerCell(value) : key === "country_code_fk" ? getCountryCell(value) : key === "mfa_status_fk" ? getStatusBadge(value) : key === "transaction_status_fk" ? getStatusBadge(value) : key === "title_id_fk" ? getTitleCell(value) : value}
         </>;
     }
 
     return (
         <BackgroundGradient className="rounded-[22px] sm:p-1 ">
             <Table
-
                 aria-label="Transactions Table"
                 bottomContent={
                     <div className="flex w-full justify-center pointer-events-auto  ">
-
                         <Pagination
                             classNames={{
                                 wrapper: "gap-0 overflow-visible rounded border-divider",
@@ -110,7 +132,6 @@ export default function TransactionsTable() {
                             isCompact
                             showControls
                             showShadow
-
                             page={page}
                             total={pages}
                             onChange={(page) => setPage(page)}

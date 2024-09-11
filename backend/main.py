@@ -31,3 +31,27 @@ async def get_transactions():
 @app.get("/customers")
 async def get_customers():
     return get_table("customer")
+
+@app.get("/titles")
+async def get_titles():
+    return get_table("title")
+
+@app.get("/countries")
+async def get_countries():
+    return get_table("country")
+
+@app.get("/currencies")
+async def get_currencies():
+    return get_table("currency")
+
+@app.get("/payment_methods")
+async def get_payment_methods():
+    return get_table("payment_method")
+
+@app.get("/transaction_statuses")
+async def get_transaction_statuses():
+    return get_table("transaction_status")
+
+@app.get("/mfa_statuses")
+async def get_mfa_statuses():
+    return get_table("mfa_status")

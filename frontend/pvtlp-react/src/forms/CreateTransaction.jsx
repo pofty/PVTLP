@@ -1,303 +1,306 @@
-import React, { useState, useEffect } from 'react';
-import { Field, Label, Switch } from '@headlessui/react';
-import { getCustomers, getTransactions } from '../utils/api_call_backend';
-import { ISO_4217_CURRENCIES, COUNTRIES } from '../utils/constants';
-import DatePicker from 'react-datepicker';
+import React, {useState, useEffect} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
+import {Divider} from "@aws-amplify/ui-react";
+import {Flex, Text, DropdownMenu, Button, Select, Slider} from "@radix-ui/themes";
+import {getCallToBackend, getCustomers, getTitles, getTransactions} from '../utils/api_call_backend';
+
+import {ISO_4217_CURRENCIES, COUNTRIES} from '../utils/constants';
 import {FlipWords} from "../components/FlipWordsDemo";
+import {AgreementField} from "../components/AgreementField";
+import {TimestampField} from "../components/TimeStampField";
+import {NumberField} from "../components/AmoutField";
+import {SubmitButton} from "../components/SubmitButton";
+import {
+    Country,
+    Currency,
+    Customer,
+    MFAStatus,
+    PaymentMethod,
+    Title,
+    Transaction,
+    TransactionStatus
+} from "../tables/data";
+import {API_Endpoint} from "../utils/api_endpoints";
+import {getCountryCell} from "../components/CoutryFlag";
+import {BackgroundGradient} from "../components/background-gradient";
+import {CalloutMessage} from "../components/CalloutMessage";
+import {AsyncSelectField} from "../components/AsyncMenu";
 
-function AgreementField({ agreed, setAgreed }) {
-  return (
-    <Field className="flex gap-x-4 sm:col-span-2">
-      <div className="flex h-6 items-center">
-        <Switch
-          checked={agreed}
-          onChange={setAgreed}
-          className="group flex w-8 flex-none cursor-pointer rounded-full bg-gray-200 p-px ring-1 ring-inset ring-gray-900/5 transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 data-[checked]:bg-indigo-600"
-        >
-          <span className="sr-only">Agree to policies</span>
-          <span
-            aria-hidden="true"
-            className="h-4 w-4 transform rounded-full bg-white shadow-sm ring-1 ring-gray-900/5 transition duration-200 ease-in-out group-data-[checked]:translate-x-3.5"
-          />
-        </Switch>
-      </div>
-      <p className="text-sm leading-6 text-gray-600">
-        By selecting this, you agree to our{' '}
-        <a href="https://www.primevideo.com/help?nodeId=202095490&view-type=content-only" target="_blank" className="font-semibold text-indigo-600">
-          Prime Video Terms and Conditions
-        </a>
-        .
-      </p>
-    </Field>
-  );
-}
+const Form = ({agreed, setAgreed}) => {
+    const [customerId, setCustomerId] = useState(null);
+    const [numberOfAttempts, setNumberOfAttempts] = useState(1);
+    const [timestamp, setTimestamp] = useState(new Date());
+    const [mfaStatus, setMfaStatus] = useState('');
+    const [transactionStatus, setTransactionStatus] = useState('');
+    const [titleId, setTitleId] = useState(null);
+    const [currencyCode, setCurrencyCode] = useState('');
+    const [countryCode, setCountryCode] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [amount, setAmount] = useState(1);
+    const [isCalloutVisible, setIsCalloutVisible] = useState(false);
+    const [calloutMessage, setCalloutMessage] = useState("");
 
-function Header() {
-  return (
+    const loadCustomerOptions = async () => {
+        const customers = await getCallToBackend(API_Endpoint.Customers, Customer);
+        return customers.map((customer) => ({
+            value: customer.customer_id_pk,
+            label: (
+                <>
+                    <Flex direction="column">
+                        <Text size="2" weight="bold">
+                            {customer.first_name} {customer.last_name}
+                        </Text>
+                        <Text color="gray" size="1">
+                            Customer Id: {customer.customer_id_pk}    </Text>
+                    </Flex>
+                </>
+            )
+        }));
+    };
+    const loadTitleOptions = async () => {
+        const titles = await getCallToBackend("titles", Title);
+        return titles.map((title) => ({
+            value: title.title_id_pk,
+            label: (
+                <>
+                    <Flex direction="column">
+                        <Text size="2" weight="bold">
+                            {title.name}
+                        </Text>
+                        <Text color="gray" size="1">
+                            Title Id: {title.title_id_pk}
+                        </Text>
+                    </Flex>
+
+                </>
+            )
+        }));
+    };
+    const loadPaymentMethodOptions = async () => {
+        try {
+            const paymentMethods = await getCallToBackend(API_Endpoint.Payment_Methods, PaymentMethod);
+            console.log("Payment Methods: ", paymentMethods);  // Debugging line
+            return paymentMethods.map((paymentMethod) => ({
+                value: paymentMethod.payment_method_pk,
+                label: paymentMethod.payment_method_pk
+            }));
+        } catch (error) {
+            console.error("Error fetching payment methods: ", error);
+            return [];
+        }
+    }
+    const loadCountriesMethodOptions = async () => {
+        try {
+            const countries = await getCallToBackend(API_Endpoint.Countries, Country);
+            console.log("Countries: ", countries);  // Debugging line
+            return countries.map((country) => ({
+                value: country.country_iso_alpha_code_pk,
+                label:
+                    <Flex direction="row>" gap="3" align="center">
+                        {getCountryCell(country.country_iso_alpha_code_pk)}
+                        <Text size="2">
+                            {country.country_iso_alpha_code_pk}
+                        </Text>
+                    </Flex>
+            }));
+        } catch (error) {
+            console.error("Error fetching countries: ", error);
+            return [];
+        }
+    }
+    const loadCurrencyOptions = async () => {
+        try {
+            const currencies = await getCallToBackend(API_Endpoint.Currencies, Currency);
+            console.log("Currencies: ", currencies);  // Debugging line
+            return currencies.map((currency) => ({
+                value: currency.currency_iso_4217_code_pk,
+                label: currency.currency_iso_4217_code_pk
+            }));
+        } catch (error) {
+            console.error("Error fetching currencies: ", error);
+            return [];
+        }
+    }
+    const loadMfaStatusOptions = async () => {
+        try {
+            const mfaStatuses = await getCallToBackend(API_Endpoint.MFA_Statues, MFAStatus);
+            console.log("MFA Statuses: ", mfaStatuses);  // Debugging line
+
+            return mfaStatuses
+        } catch (error) {
+            console.error("Error fetching MFA statuses: ", error);
+            return [];
+        }
+    };
+    const loadTransactionStatusOptions = async () => {
+        try {
+            const transactionStatuses = await getCallToBackend(API_Endpoint.Transaction_Statuses, TransactionStatus);
+            console.log("Transaction Statuses: ", transactionStatuses);  // Debugging line
+            return transactionStatuses;
+        } catch (error) {
+            console.error("Error fetching transaction statuses: ", error);
+            return [];
+        }
+    }
+
+    return (
+
+        <form action="#" method="POST" className="shadow-lg mx-auto mt-8 max-w-xl ">
+            <BackgroundGradient>
+                <div className="rounded-md grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 p-5 bg-white">
+                    <CalloutMessage message={calloutMessage} visible={isCalloutVisible} setVisibility={setIsCalloutVisible}/>
+
+                    <AsyncSelectField label="Customer" loadOptions={loadCustomerOptions} value={customerId}
+                                      onChange={setCustomerId} id="customer-idv" fullRow={true}/>
+                    <AsyncSelectField label="Title" loadOptions={loadTitleOptions} value={titleId} onChange={setTitleId}
+                                      id="title-id" fullRow={true}/>
+                    <AsyncSelectField label="Country Of transaction" loadOptions={loadCountriesMethodOptions}
+                                      value={countryCode} onChange={setCountryCode}
+                                      id="country-of-transaction"/>
+
+                    <AsyncSelectField label="Currency" loadOptions={loadCurrencyOptions} value={currencyCode}
+                                      onChange={setCurrencyCode}
+                                      id="currency"/>
+                    <AsyncSelectField label="Payment Method" loadOptions={loadPaymentMethodOptions}
+                                      value={paymentMethod} onChange={setPaymentMethod}
+                                      id="payment-method"/>
+                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={1} max={200} setCalloutVisibility={setIsCalloutVisible} setCalloutMessage={setCalloutMessage}/>
+
+                    <DropDownSelectMenu label="MFA Status" loadOptions={loadMfaStatusOptions} value={mfaStatus}
+                                        onChange={setMfaStatus}
+                                        id="mfa-status"/>
+                    <DropDownSelectMenu label="Transaction Status" loadOptions={loadTransactionStatusOptions}
+                                        value={transactionStatus}
+                                        onChange={setTransactionStatus} id="transaction-status"/>
+
+                    <TimestampField timestamp={timestamp} setTimestamp={setTimestamp}/>
+                    {/*<NumberField fieldName={"Number of Attempts"} number={numberOfAttempts}*/}
+                    {/*             setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible}/>*/}
+                    <AgreementField agreed={agreed} setAgreed={setAgreed}/>
+                    <SubmitButton/>
+                </div>
+
+            </BackgroundGradient>
+
+        </form>
+    );
+};
+
+const CreateTransaction = () => {
+    const [agreed, setAgreed] = useState(false);
+
+    return (
+        <div className="isolate bg-white">
+            <div className="flex justify-start items-center px-8">
+                <div className="font-bold text-5xl mx-auto text-blue-500">
+                    Prime Video
+                    <FlipWords words={["Movies", "TV Shows", "Live Sport", "Entertainment"]}/>
+                    <br/>
+                </div>
+            </div>
+            <Header/>
+            <Form agreed={agreed} setAgreed={setAgreed}/>
+        </div>
+    );
+};
+
+const Header = () => (
     <div className="mx-auto max-w-2xl text-center">
-      <p className="mt-2 text-lg leading-8 text-gray-600">
-        Create a transaction record in Prime Video Transaction Ledger Portal
-      </p>
+        <p className="mt-2 text-lg leading-8 text-gray-600">
+            Create a transaction record in Prime Video Transaction Ledger Portal
+        </p>
+        <Divider orientation="horizontal"/>
+        <br/>
     </div>
-  );
+);
+
+function GetDropDownItemColour(value) {
+    const status_to_color = {
+        "Successful": "green",
+        "Failed": "red",
+        "Grandfathered": "gold",
+        "Exempted": "jade",
+        "Pending": "orange",
+        "Cancelled": "red"
+    };
+    return status_to_color[value] || 'white';
 }
 
-function SubmitButton() {
-  return (
-    <div className="mt-10">
-      <button
-        type="submit"
-        className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-      >
-        Let's talk
-      </button>
-    </div>
-  );
+function DropDownSelectMenu({label, loadOptions, value, onChange, id}) {
+    const [menuColor, setMenuColor] = useState('gray');
+    const [options, setOptions] = useState([]);
+
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const loadedOptions = await loadOptions();
+                setOptions(loadedOptions);
+                console.log("Loaded Options: ", loadedOptions);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchOptions();
+    }, [loadOptions]);
+
+    const handleSelect = (selectedValue) => {
+        onChange(selectedValue);
+        setMenuColor(GetDropDownItemColour(selectedValue));
+    };
+
+    return (
+        <div>
+            <label htmlFor={id} className="block text-sm font-semibold text-gray-900 mb-2">
+                {label}
+            </label>
+            <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                    <Button className="mt-2 w-full shadow-sm" color={menuColor} variant="solid" size="2">
+                        {options.find(option => option.status_name_pk === value)?.status_name_pk || "Select an option"}
+                        <DropdownMenu.TriggerIcon/>
+                    </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                    {options.map(option => (
+                        <DropdownMenu.Item
+                            key={option.status_name_pk}
+                            onSelect={() => handleSelect(option.status_name_pk)}
+                        >
+                            {option.status_name_pk}
+                        </DropdownMenu.Item>
+                    ))}
+                </DropdownMenu.Content>
+            </DropdownMenu.Root>
+        </div>
+    );
 }
 
-function Form({ agreed, setAgreed, customers, titles }) {
-  const [numberOfAttempts, setNumberOfAttempts] = useState(1);
-  const [timestamp, setTimestamp] = useState(new Date());
-  const [mfaStatus, setMfaStatus] = useState('');
-  const [transactionStatus, setTransactionStatus] = useState('');
-  const [customerId, setCustomerId] = useState(null);
-  const [titleId, setTitleId] = useState(null);
-  const [currencyCode, setCurrencyCode] = useState('');
-  const [countryCode, setCountryCode] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [amount, setAmount] = useState(1);
 
-  const mfaStatusOptions = [
-    { value: 'Grandfathered', label: 'Grandfathered' },
-    { value: 'Exempted', label: 'Exempted' },
-    { value: 'Pending', label: 'Pending' },
-    { value: 'Cancelled', label: 'Cancelled' },
-  ];
-
-  const transactionStatusOptions = [
-    { value: 'Failed', label: 'Failed' },
-    { value: 'Grandfathered', label: 'Grandfathered' },
-    { value: 'Exempted', label: 'Exempted' },
-    { value: 'Pending', label: 'Pending' },
-    { value: 'Cancelled', label: 'Cancelled' },
-  ];
-
-  const paymentMethodOptions = [
-    { value: 'Credit Card', label: 'Credit Card' },
-    { value: 'PayPal', label: 'PayPal' },
-    { value: 'Debit Card', label: 'Debit Card' },
-    { value: 'Bank Transfer', label: 'Bank Transfer' },
-  ];
-
-  const loadCustomerOptions = async (inputValue) => {
-    const customers = await getCustomers();
-    return customers.map((customer) => ({
-      value: customer.customer_id_pk,
-      label: `${customer.first_name} ${customer.last_name}`,
-    }));
-  };
-
-  const loadTitleOptions = async (inputValue) => {
-    const titles = await getTransactions();
-    return titles.map((title) => ({
-      value: title.title_id_fk,
-      label: title.title_id_fk,
-    }));
-  };
-
-  return (
-    <form action="#" method="POST" className="mx-auto mt-8 max-w-xl">
-      <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-        <div>
-          <label htmlFor="number-of-attempts" className="block text-sm font-semibold leading-6 text-gray-900">
-            Number of Attempts
-          </label>
-          <div className="mt-2.5">
-            <input
-              id="number-of-attempts"
-              name="number-of-attempts"
-              type="number"
-              min="1"
-              max="10"
-              value={numberOfAttempts}
-              onChange={(e) => setNumberOfAttempts(e.target.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
+function SelectMenu({label, options, value, onChange, id}) {
+    return (
+        <div className="w-full">
+            <label htmlFor={id} className="block text-sm font-semibold text-gray-900 mb-2">
+                {label}
+            </label>
+            <Select.Root value={value} onValueChange={onChange}>
+                <Select.Trigger className="mt-2 w-full" placeholder="Select an option">
+                    {options.find(option => option.value === value)?.label || "Select an option"}
+                </Select.Trigger>
+                <Select.Content>
+                    <Select.Group>
+                        {options.map(option => (
+                            <Select.Item key={option.value} value={option.value}>
+                                {option.label}
+                            </Select.Item>
+                        ))}
+                    </Select.Group>
+                </Select.Content>
+            </Select.Root>
         </div>
-        <div>
-          <label htmlFor="timestamp" className="block text-sm font-semibold leading-6 text-gray-900">
-            Timestamp
-          </label>
-          <div className="mt-2.5">
-            <DatePicker
-              selected={timestamp}
-              onChange={(date) => setTimestamp(date)}
-              showTimeSelect
-              dateFormat="Pp"
-              minDate={new Date('2010-01-01')}
-              maxDate={new Date()}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            <button type="button" onClick={() => setTimestamp(new Date())} className="mt-2 text-indigo-600">
-              Now
-            </button>
-          </div>
-        </div>
-        <div>
-          <label htmlFor="mfa-status" className="block text-sm font-semibold leading-6 text-gray-900">
-            MFA Status
-          </label>
-          <div className="mt-2.5">
-            <Select
-              id="mfa-status"
-              name="mfa-status"
-              options={mfaStatusOptions}
-              value={mfaStatusOptions.find((option) => option.value === mfaStatus)}
-              onChange={(option) => setMfaStatus(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="transaction-status" className="block text-sm font-semibold leading-6 text-gray-900">
-            Transaction Status
-          </label>
-          <div className="mt-2.5">
-            <Select
-              id="transaction-status"
-              name="transaction-status"
-              options={transactionStatusOptions}
-              value={transactionStatusOptions.find((option) => option.value === transactionStatus)}
-              onChange={(option) => setTransactionStatus(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="customer-id" className="block text-sm font-semibold leading-6 text-gray-900">
-            Customer
-          </label>
-          <div className="mt-2.5">
-            <AsyncSelect
-              id="customer-id"
-              name="customer-id"
-              loadOptions={loadCustomerOptions}
-              value={customerId}
-              onChange={(option) => setCustomerId(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="title-id" className="block text-sm font-semibold leading-6 text-gray-900">
-            Title
-          </label>
-          <div className="mt-2.5">
-            <AsyncSelect
-              id="title-id"
-              name="title-id"
-              loadOptions={loadTitleOptions}
-              value={titleId}
-              onChange={(option) => setTitleId(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="currency-code" className="block text-sm font-semibold leading-6 text-gray-900">
-            Currency
-          </label>
-          <div className="mt-2.5">
-            <Select
-              id="currency-code"
-              name="currency-code"
-              options={ISO_4217_CURRENCIES}
-              value={ISO_4217_CURRENCIES.find((option) => option.value === currencyCode)}
-              onChange={(option) => setCurrencyCode(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="country-code" className="block text-sm font-semibold leading-6 text-gray-900">
-            Country
-          </label>
-          <div className="mt-2.5">
-            <Select
-              id="country-code"
-              name="country-code"
-              options={COUNTRIES}
-              value={COUNTRIES.find((option) => option.value === countryCode)}
-              onChange={(option) => setCountryCode(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="payment-method" className="block text-sm font-semibold leading-6 text-gray-900">
-            Payment Method
-          </label>
-          <div className="mt-2.5">
-            <Select
-              id="payment-method"
-              name="payment-method"
-              options={paymentMethodOptions}
-              value={paymentMethodOptions.find((option) => option.value === paymentMethod)}
-              onChange={(option) => setPaymentMethod(option.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="amount" className="block text-sm font-semibold leading-6 text-gray-900">
-            Amount
-          </label>
-          <div className="mt-2.5">
-            <input
-              id="amount"
-              name="amount"
-              type="number"
-              min="1"
-              max="200"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <AgreementField agreed={agreed} setAgreed={setAgreed} />
-      </div>
-      <SubmitButton />
-    </form>
-  );
+    );
 }
 
-export default function CreateTransaction() {
-  const [agreed, setAgreed] = useState(false);
-  const [customers, setCustomers] = useState([]);
-  const [titles, setTitles] = useState([]);
 
-  useEffect(() => {
-    getCustomers().then(setCustomers);
-    getTransactions().then(setTitles);
-  }, []);
-
-  return (
-      <div className="isolate bg-white ">
-          <div className=" flex justify-center items-center px-8">
-              <div className="text-5xl mx-auto font-normal text-blue-500 font-bold">
-                  Prime Video
-                  <FlipWords words={["Movies", "Shows", "Live Sport"]}/> <br/>
-              </div>
-
-
-          </div>
-          <Header/>
-          <Form agreed={agreed} setAgreed={setAgreed} customers={customers} titles={titles}/>
-      </div>
-  );
-}
+export default CreateTransaction;

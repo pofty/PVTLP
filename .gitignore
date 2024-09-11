@@ -1,8 +1,6 @@
 ### Manually created
-backend/data/*
-
-
-
+backend/data/db_auth_cred.py
+backend/data/temp.py
 
 ### Auto Created by IDE
 ### Amplify template

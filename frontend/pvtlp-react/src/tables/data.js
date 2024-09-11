@@ -38,8 +38,40 @@ export class Customer {
         this.home_country_code_fk = home_country_code_fk;
     }
 }
-export const transactions01 = [
-    new Transaction("355bf501-ffea-4f5a-a9e2-16074de6fcf2", 3, "2023-08-21T10:30:00Z", "Grandfathered", "Completed", "355bf501-ffea-4f5a-a9e2-16074de6fcf2", "Harry Potter and the Philosopher's Stone", "USD", "USA", "Credit Card", 250.75),
-    ];
+
+export class Title {
+    constructor(title_id_pk, name) {
+        this.title_id_pk = title_id_pk;
+        this.name = name;
+    }
+}
+
+export class Country {
+    constructor(country_iso_alpha_code_pk) {
+        this.country_iso_alpha_code_pk = country_iso_alpha_code_pk;}
+}
+
+export class Currency {
+    constructor(currency_iso_4217_code_pk) {
+        this.currency_iso_4217_code_pk = currency_iso_4217_code_pk;}
+}
+
+export class PaymentMethod {
+    constructor(payment_method_pk, name) {
+        this.payment_method_pk = payment_method_pk;
+    }
+}
+
+export class TransactionStatus {
+    constructor(transaction_status_name_pk) {
+        this.transaction_status_name_pk = transaction_status_name_pk;
+    }
+}
+
+export class MFAStatus {
+    constructor(mfa_status_id_pk) {
+        this.status_name_pk = mfa_status_id_pk;
+    }
+}
 
 export {columns};

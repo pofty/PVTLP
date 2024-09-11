@@ -1,5 +1,6 @@
 import axios from 'axios';
-import {Customer, Transaction} from "../tables/data"
+import {Customer, Title, Transaction} from "../tables/data"
+import {table} from "@nextui-org/theme";
 
 const baseUrl = 'http://localhost:8000/';
 
@@ -29,17 +30,17 @@ export const getTransactions = async () => {
     }
 }
 
-export const getCustomers = async () => {
-    console.log('getTransactions called'); // Log to check if function is called
+export const getCallToBackend = async (apiEndPoint: string, dataType: any) => {
+    console.log('getCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
     let json;
     try {
-        const response = await apiCallBackend(baseUrl+ "customers", 'GET');
+        const response = await apiCallBackend(baseUrl + apiEndPoint, 'GET');
         json = JSON.stringify(response);
-        let transactions: Customer[] = JSON.parse(json);
-        console.log('Customers', transactions); // Log to check the transactions
-        return transactions;
+        let retrievedData: typeof dataType[] = JSON.parse(json);
+        console.log('data retrieved: ', retrievedData); // Log to check the transactions
+        return retrievedData;
     } catch (error) {
-        console.error('Failed to fetch transactions:', error);
+        console.error('Failed to fetch and parse table of: ' + table, error);
         throw error;
     }
 }
