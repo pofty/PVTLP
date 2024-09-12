@@ -19,6 +19,10 @@ amplifyconfiguration.json
 amplify-build-config.json
 amplify-gradle-config.json
 amplifyxc.config
+amplifytools.xcconfig
+.secret-*
+**.sample
+#amplify-do-not-edit-end
 
 ### Node template
 # Logs
@@ -227,7 +231,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+backend/lib/
 lib64/
 parts/
 sdist/
