@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 
-export const NumberField = ({ fieldName, number, setNumber, min, max, setCalloutVisibility, setCalloutMessage}) => {
+export const NumberField = ({ fieldName, number, setNumber, min, max, setCalloutVisibility, setCalloutMessage, setCalloutColor}) => {
     useEffect(() => {
         if (number < min) {
             setNumber(min);
             setCalloutVisibility(false);
+            setCalloutColor("red");
             setCalloutMessage(fieldName + " value is too small, please enter a number between " + min + " and " + max);
             setCalloutVisibility(true);
         } else if (number > max) {
             setNumber(max);
             setCalloutVisibility(false);
+            setCalloutColor("red");
             setCalloutMessage(fieldName + " value is too large, please enter a number between " + min + " and " + max);
             setCalloutVisibility(true);
         }

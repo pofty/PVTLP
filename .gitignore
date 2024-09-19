@@ -7,6 +7,7 @@ backend/data/temp.py
 ### Auto Created by IDE
 ### Amplify template
 # AWS Amplify
+**/frontend/pvtlp-react/amplify/*
 amplify/\#current-cloud-backend
 amplify/.config/local-*
 amplify/mock-data
@@ -377,7 +378,7 @@ cython_debug/
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+.idea/
 
 # IDE - JetBrains IntelliJ & VSCode
 out/

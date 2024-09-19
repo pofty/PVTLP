@@ -4,9 +4,9 @@ from uuid import UUID
 from datetime import datetime
 from backend.db_auth_cred import connection_string
 
-def get_table(table_name: str, connection: str = connection_string):
+def get_table(table_name: str):
     global engine
-    engine = create_engine(connection)
+    engine = create_engine(connection_string)
     metadata = sqlalchemy.MetaData()
     transaction = sqlalchemy.Table(table_name, metadata, autoload_with=engine)
     with engine.connect() as conn:
@@ -29,4 +29,4 @@ def get_table(table_name: str, connection: str = connection_string):
         return data
 
 
-#print(get_table("transaction"))
+print(get_table("transaction"))

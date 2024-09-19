@@ -7,4 +7,5 @@ export enum API_Endpoint {
     MFA_Statues = 'mfa_statuses',
     Transaction_Statuses = 'transaction_statuses',
     Payment_Methods = 'payment_methods',
+    Create_Transaction = 'createtransaction',
 }

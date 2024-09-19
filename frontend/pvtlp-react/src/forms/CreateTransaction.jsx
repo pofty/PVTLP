@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Divider} from "@aws-amplify/ui-react";
-import {Flex, Text, DropdownMenu, Button, Select} from "@radix-ui/themes";
-import {getCallToBackend} from '../utils/api_call_backend';
+import {Flex, Text, DropdownMenu, Button, Select, Spinner} from "@radix-ui/themes";
+import {getCallToBackend, postCallToBackend} from '../utils/api_call_backend';
 import {FlipWords} from "../components/FlipWordsDemo";
 import {AgreementField} from "../components/AgreementField";
 import {TimestampField} from "../components/TimeStampField";
@@ -28,6 +28,8 @@ const Form = ({agreed, setAgreed}) => {
     const [amount, setAmount] = useState(1);
     const [isCalloutVisible, setIsCalloutVisible] = useState(false);
     const [calloutMessage, setCalloutMessage] = useState("");
+    const [calloutColor, setCalloutColor] = useState("red");
+
     const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false)
 
     const loadCustomerOptions = async () => {
@@ -142,16 +144,51 @@ const Form = ({agreed, setAgreed}) => {
             console.log("all set")
         } else {
             setIsSubmitButton(false);
-                        console.log("not")
         }
     }
 
-    return (
+function postTransaction() {
+    const transaction = {
+        customer_id_fk: customerId,
+        title_id_fk: titleId,
+        country_code_fk: countryCode,
+        currency_code_fk: currencyCode,
+        payment_method_fk: paymentMethod,
+        transaction_status_fk: transactionStatus,
+        amount: amount,
+        timestamp: timestamp,
+        number_of_attempts: numberOfAttempts,
+        mfa_status_fk: mfaStatus
+    };
 
-        <form action="#" method="POST" className="shadow-lg mx-auto mt-8 max-w-xl ">
-            <BackgroundGradient>
+    console.log("Posting transaction: ", transaction);
+    postCallToBackend(API_Endpoint.Create_Transaction, transaction).then(r => {
+        console.log("Transaction posted: ", r);
+        setIsCalloutVisible(true);
+        setCalloutColor("green");
+        setCalloutMessage("Transaction posted successfully, Transaction ID: " + r);
+    }).catch(error => {
+        console.error("Error posting transaction: ", error);
+        setIsCalloutVisible(true);
+        setCalloutMessage("Error posting transaction");
+    });
+}
+
+    function SubmitFormButton() {
+        return (
+        <div className="sm:col-span-2">
+            <Button variant="solid" className={`mt-2 w-full shadow-sm`} disabled={!isSubmitButtonEnabled} type="submit">
+                {isSubmitButtonEnabled ? "Submit" :  <Spinner/>}
+                {isSubmitButtonEnabled ? "" : "fill in all fields"}
+            </Button>
+        </div>
+    );
+    }
+
+    return (
+<form onSubmit={(e) => { e.preventDefault(); postTransaction(); }} method="POST" className="shadow-lg mx-auto mt-8 max-w-xl ">            <BackgroundGradient>
                 <div className="rounded-md grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 p-5 bg-white">
-                    <CalloutMessage message={calloutMessage} visible={isCalloutVisible} setVisibility={setIsCalloutVisible}/>
+                    <CalloutMessage message={calloutMessage} visible={isCalloutVisible} setVisibility={setIsCalloutVisible} calloutColor={calloutColor}/>
 
                     <AsyncSelectField label="Customer" loadOptions={loadCustomerOptions} value={customerId}
                                       onChange={setCustomerId} id="customer-idv" fullRow={true}/>
@@ -166,8 +203,7 @@ const Form = ({agreed, setAgreed}) => {
                     <AsyncSelectField label="Payment Method" loadOptions={loadPaymentMethodOptions}
                                       value={paymentMethod} onChange={setPaymentMethod}
                                       id="payment-method"/>
-                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={1} max={200} setCalloutVisibility={setIsCalloutVisible} setCalloutMessage={setCalloutMessage}/>
-
+                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={1} max={200} setCalloutVisibility={setIsCalloutVisible} setCalloutMessage={setCalloutMessage} setCalloutColor={setCalloutColor}/>
                     <DropDownSelectMenu label="MFA Status" loadOptions={loadMfaStatusOptions} value={mfaStatus}
                                         onChange={setMfaStatus}
                                         id="mfa-status"/>
@@ -175,10 +211,10 @@ const Form = ({agreed, setAgreed}) => {
                                         value={transactionStatus}
                                         onChange={setTransactionStatus} id="transaction-status"/>
                     <NumberField fieldName={"Number of Attempts"} number={numberOfAttempts}
-                                 setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible}/>
+                                 setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible} setCalloutColor={setCalloutColor}/>
                     <TimestampField timestamp={timestamp} setTimestamp={setTimestamp}/>
                     <AgreementField agreed={agreed} setAgreed={setAgreed}/>
-                    <SubmitButton enable={isSubmitButtonEnabled}/>
+                    <SubmitFormButton />
                 </div>
 
             </BackgroundGradient>
@@ -276,31 +312,5 @@ function DropDownSelectMenu({label, loadOptions, value, onChange, id}) {
         </div>
     );
 }
-
-
-function SelectMenu({label, options, value, onChange, id}) {
-    return (
-        <div className="w-full">
-            <label htmlFor={id} className="block text-sm font-semibold text-gray-900 mb-2">
-                {label}
-            </label>
-            <Select.Root value={value} onValueChange={onChange}>
-                <Select.Trigger className="mt-2 w-full" placeholder="Select an option">
-                    {options.find(option => option.value === value)?.label || "Select an option"}
-                </Select.Trigger>
-                <Select.Content>
-                    <Select.Group>
-                        {options.map(option => (
-                            <Select.Item key={option.value} value={option.value}>
-                                {option.label}
-                            </Select.Item>
-                        ))}
-                    </Select.Group>
-                </Select.Content>
-            </Select.Root>
-        </div>
-    );
-}
-
 
 export default CreateTransaction;
