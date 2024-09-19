@@ -6,31 +6,30 @@ import NavBar from "./components/NavBar";
 import Example from "src/forms/CreateTransaction";
 import TransactionsTable from "./tables/TransactionsTable";
 import CreateTransaction from "src/forms/CreateTransaction";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import {FlipWords} from "./components/FlipWordsDemo";
+import Home from "./Pages/Home";
+import AuthPage from "./Pages/AuthPage"
+import { UserProvider } from './UserContext';
+import TransactionsPage from "./Pages/TransactionsPage";
 
 function App() {
     const [userName, setUserName] = React.useState<string | undefined>(undefined);
 
     return (
-        <>
             <Theme accentColor="blue">
-                <NavBar userName={userName} setUserName={setUserName}/>
-                <br/>
-                <br/>
-
-                {/*<TransactionsTable/>*/}
-                <CreateTransaction/>
-                <br/>
-
-
-                {/*<Example/>*/}
-                {/*<Auth setUserName={setUserName}/>*/}
-                <h1>App</h1>
-                {/*<TransactionsTable/>*/}
-                <br/>
+                <UserProvider>
+                <Router>
+                    <NavBar/>
+                    <Routes>
+                        <Route path="/" element={<Home/>} />
+                        <Route path="/CreateTransaction" element={<CreateTransaction />} />
+                        <Route path="/TransactionsPage" element={<TransactionsPage />} />
+                        <Route path="/Auth" element={<AuthPage />} />
+                    </Routes>
+                </Router>
+                </UserProvider>
             </Theme>
-
-        </>
     );
 }
 export default App;

@@ -40,6 +40,7 @@ const Form = ({agreed, setAgreed}) => {
     const [amount, setAmount] = useState(1);
     const [isCalloutVisible, setIsCalloutVisible] = useState(false);
     const [calloutMessage, setCalloutMessage] = useState("");
+    const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false)
 
     const loadCustomerOptions = async () => {
         const customers = await getCallToBackend(API_Endpoint.Customers, Customer);

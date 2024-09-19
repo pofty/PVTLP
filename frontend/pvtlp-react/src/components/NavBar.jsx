@@ -1,12 +1,13 @@
-// Move SignOut logic inside a React component
 import React, { useState } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Bars3Icon, WifiIcon, XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
 import pvLogo02 from '../assets/pv-logo2.png';
-import {SignOut } from '../lib/Auth';
+import { SignOut } from '../lib/Auth';
+import { useUser } from '../UserContext';
+import {useNavigate} from "react-router-dom";
 
 const navigationItems = [
-    { name: 'Transactions', href: '/transactions'},
+    { name: 'Transactions', href: '/TransactionsPage' },
     { name: 'Customers', href: '#' },
 ];
 
@@ -14,11 +15,13 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
 }
 
-
-export default function NavBar({userName, setUserName}) {
+export default function NavBar() {
+    const { userName, setUserName } = useUser();
     const [currentPage, setCurrentPage] = useState('Dashboard');
+    const navigate = useNavigate();
 
     function WelcomeUserWithUsername() {
+        console.log("usernmae is " + userName)
     if (userName) {
         return (
             <a className=" block text-center py-1 text-gray-700">
@@ -27,7 +30,7 @@ export default function NavBar({userName, setUserName}) {
         );
     } else {
         return (
-            <a href="#" className="block text-center px-4 py-2 text-sm text-gray-700">
+            <a href="/auth" className="block text-center px-4 py-2 text-sm text-gray-700">
                 <p> login to proceed 😊 </p>
             </a>
         );
@@ -42,6 +45,7 @@ function SignOutUser() {
 }
 
     return (
+        <>
         <Disclosure as="nav" className="bg-black">
             <div className="mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="relative flex h-16 items-center justify-between">
@@ -61,6 +65,7 @@ function SignOutUser() {
                                 alt="Your Company"
                                 src={pvLogo02}
                                 className="h-9 w-auto"
+                                onClick={() => navigate("/")}
                             />
                         </div>
                         <div className="hidden sm:ml-6 sm:block">
@@ -127,5 +132,7 @@ function SignOutUser() {
                 </div>
             </DisclosurePanel>
         </Disclosure>
+    <br/>
+        </>
     );
 }

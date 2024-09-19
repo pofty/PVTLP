@@ -5,25 +5,23 @@ import reportWebVitals from './reportWebVitals';
 import '@radix-ui/themes/styles.css';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
-// import config from './amplifyconfiguration.json';
+import amplifyConfig from './amplifyconfiguration.json';
 import {NextUIProvider} from "@nextui-org/react";
 import './output.css';
 
-// Amplify.configure(config);
+Amplify.configure(amplifyConfig);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-            <Authenticator.Provider>
-                    <NextUIProvider>
-
-            <App />
-                        </NextUIProvider>
-
+    <React.StrictMode>
+        <Authenticator.Provider>
+            <NextUIProvider>
+                <App />
+            </NextUIProvider>
         </Authenticator.Provider>
-  </React.StrictMode>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

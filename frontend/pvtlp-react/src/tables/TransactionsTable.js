@@ -2,12 +2,13 @@ import React, {useEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 import {columns, Customer, Title} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
-import {Flex, Box, IconButton, Badge} from "@radix-ui/themes";
-import {Pencil1Icon as EditIcon} from "@radix-ui/react-icons";
+import {Flex, Box, IconButton, Button, Badge, } from "@radix-ui/themes";
+import {Pencil1Icon as EditIcon, PlusIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
-import {getCustomers, getTransactions, getTitles} from "../utils/api_call_backend";
+import {getCallToBackend, getTransactions} from "../utils/api_call_backend";
 import Flag from "react-world-flags";
-
+import {API_Endpoint} from "../utils/api_endpoints";
+import {useNavigate} from "react-router-dom";
 
     export function getCountryCell(value) {
         return (
@@ -35,6 +36,7 @@ export default function TransactionsTable() {
     const [data, setData] = useState([]);
     const [titles, setTitles] = useState([]);
     const [customers, setCustomers] = useState([Customer, ]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getTransactions()
@@ -45,15 +47,14 @@ export default function TransactionsTable() {
             .catch((error) => {
                 console.error("Error fetching transactions: ", error);
             });
-        getCustomers()
+        getCallToBackend(API_Endpoint.Customers, Customer)
             .then((customers) => {
                 setCustomers(customers);
                 console.log("customers: " + customers);
             }).catch((error) => {
             console.error("Error fetching customers: ", error);
         });
-        getTitles()
-            .then((titles) => {
+        getCallToBackend(API_Endpoint.Titles, Title)            .then((titles) => {
                 setTitles(titles);
                 console.log("titles: " + titles);
             }).catch((error) => {
@@ -116,9 +117,21 @@ export default function TransactionsTable() {
         </>;
     }
 
+    function CreateTransactionButton() {
+        return (
+            <div className='size-16'>
+                <Button color="gray" variant="outline" highContrast
+                        onClick={() => navigate("/CreateTransaction")} >
+                    <PlusIcon/> Create Transaction
+                </Button>
+            </div>
+        );
+    }
+
     return (
         <BackgroundGradient className="rounded-[22px] sm:p-1 ">
             <Table
+                topContent={<CreateTransactionButton/>}
                 aria-label="Transactions Table"
                 bottomContent={
                     <div className="flex w-full justify-center pointer-events-auto  ">
