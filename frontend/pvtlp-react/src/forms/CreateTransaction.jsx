@@ -1,26 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import AsyncSelect from 'react-select/async';
 import {Divider} from "@aws-amplify/ui-react";
-import {Flex, Text, DropdownMenu, Button, Select, Slider} from "@radix-ui/themes";
-import {getCallToBackend, getCustomers, getTitles, getTransactions} from '../utils/api_call_backend';
-
-import {ISO_4217_CURRENCIES, COUNTRIES} from '../utils/constants';
+import {Flex, Text, DropdownMenu, Button, Select} from "@radix-ui/themes";
+import {getCallToBackend} from '../utils/api_call_backend';
 import {FlipWords} from "../components/FlipWordsDemo";
 import {AgreementField} from "../components/AgreementField";
 import {TimestampField} from "../components/TimeStampField";
 import {NumberField} from "../components/AmoutField";
 import {SubmitButton} from "../components/SubmitButton";
-import {
-    Country,
-    Currency,
-    Customer,
-    MFAStatus,
-    PaymentMethod,
-    Title,
-    Transaction,
-    TransactionStatus
-} from "../tables/data";
+import {Country, Currency, Customer, MFAStatus, PaymentMethod, Title, TransactionStatus} from "../tables/data";
 import {API_Endpoint} from "../utils/api_endpoints";
 import {getCountryCell} from "../components/CoutryFlag";
 import {BackgroundGradient} from "../components/background-gradient";
@@ -186,10 +174,9 @@ const Form = ({agreed, setAgreed}) => {
                     <DropDownSelectMenu label="Transaction Status" loadOptions={loadTransactionStatusOptions}
                                         value={transactionStatus}
                                         onChange={setTransactionStatus} id="transaction-status"/>
-
+                    <NumberField fieldName={"Number of Attempts"} number={numberOfAttempts}
+                                 setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible}/>
                     <TimestampField timestamp={timestamp} setTimestamp={setTimestamp}/>
-                    {/*<NumberField fieldName={"Number of Attempts"} number={numberOfAttempts}*/}
-                    {/*             setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible}/>*/}
                     <AgreementField agreed={agreed} setAgreed={setAgreed}/>
                     <SubmitButton enable={isSubmitButtonEnabled}/>
                 </div>

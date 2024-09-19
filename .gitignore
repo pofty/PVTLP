@@ -2,6 +2,7 @@
 backend/data/temp.py
 **/nohup.out
 **/temp.*
+**/package-lock.*
 
 ### Auto Created by IDE
 ### Amplify template
@@ -380,4 +381,3 @@ cython_debug/
 
 # IDE - JetBrains IntelliJ & VSCode
 out/
-.idea/
