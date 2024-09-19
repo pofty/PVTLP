@@ -144,6 +144,19 @@ const Form = ({agreed, setAgreed}) => {
             return [];
         }
     }
+      useEffect(() => {
+        validateForm();
+    }, [customerId, titleId, countryCode, currencyCode, paymentMethod, mfaStatus, transactionStatus, amount, timestamp, agreed]);
+
+    function validateForm() {
+        if (customerId && titleId && countryCode && currencyCode && paymentMethod && mfaStatus && transactionStatus && amount && timestamp && agreed) {
+            setIsSubmitButton(true);
+            console.log("all set")
+        } else {
+            setIsSubmitButton(false);
+                        console.log("not")
+        }
+    }
 
     return (
 
@@ -159,7 +172,6 @@ const Form = ({agreed, setAgreed}) => {
                     <AsyncSelectField label="Country Of transaction" loadOptions={loadCountriesMethodOptions}
                                       value={countryCode} onChange={setCountryCode}
                                       id="country-of-transaction"/>
-
                     <AsyncSelectField label="Currency" loadOptions={loadCurrencyOptions} value={currencyCode}
                                       onChange={setCurrencyCode}
                                       id="currency"/>
@@ -179,7 +191,7 @@ const Form = ({agreed, setAgreed}) => {
                     {/*<NumberField fieldName={"Number of Attempts"} number={numberOfAttempts}*/}
                     {/*             setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible}/>*/}
                     <AgreementField agreed={agreed} setAgreed={setAgreed}/>
-                    <SubmitButton/>
+                    <SubmitButton enable={isSubmitButtonEnabled}/>
                 </div>
 
             </BackgroundGradient>

@@ -1,5 +1,4 @@
 ### Manually created
-backend/db_auth_cred.py
 backend/data/temp.py
 **/nohup.out
 **/temp.*
