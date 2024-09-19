@@ -1,6 +1,8 @@
 ### Manually created
-backend/data/db_auth_cred.py
+backend/db_auth_cred.py
 backend/data/temp.py
+**/nohup.out
+**/temp.*
 
 ### Auto Created by IDE
 ### Amplify template
@@ -379,4 +381,3 @@ cython_debug/
 # IDE - JetBrains IntelliJ & VSCode
 out/
 .idea/
-.vscode

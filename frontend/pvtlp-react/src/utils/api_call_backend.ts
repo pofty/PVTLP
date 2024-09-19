@@ -2,7 +2,7 @@ import axios from 'axios';
 import {Customer, Title, Transaction} from "../tables/data"
 import {table} from "@nextui-org/theme";
 
-const baseUrl = 'http://localhost:8000/';
+const baseUrl = 'http://18.132.89.253:8000/';
 
 
 export const apiCallBackend = async (url: string, method: string, data?: any) => {

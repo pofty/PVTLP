@@ -1,17 +1,12 @@
 import sqlalchemy
 from sqlalchemy import create_engine
-import json
 from uuid import UUID
 from datetime import datetime
-from db_auth_cred import user, password, host, port, database
+from backend.db_auth_cred import connection_string
 
-
-# get entire table from database
-connection_string = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
-
-def get_table(table_name: str):
+def get_table(table_name: str, connection: str = connection_string):
     global engine
-    engine = create_engine(connection_string)
+    engine = create_engine(connection)
     metadata = sqlalchemy.MetaData()
     transaction = sqlalchemy.Table(table_name, metadata, autoload_with=engine)
     with engine.connect() as conn:
@@ -32,3 +27,6 @@ def get_table(table_name: str):
             data.append(row_dict)
 
         return data
+
+
+#print(get_table("transaction"))

@@ -1,14 +1,9 @@
-from sqlalchemy import create_engine, MetaData, select, func
+from sqlalchemy import create_engine, MetaData, select
 from sqlalchemy.sql import insert
 import random
-from data.create_db_schemas import transaction_status, payment_method, mfa_status, customer, country, currency, title, \
+from create_db_schemas import customer, title, \
     transaction
-from data.inject_synthetic_data_to_dependency_tables import connection
-from db_auth_cred import user, password, host, port, database
-
-
-# PostgreSQL connection string format
-connection_string = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+from backend.db_auth_cred import connection_string
 
 # Create an engine
 engine = create_engine(connection_string)
@@ -189,7 +184,6 @@ with (connection):
             'country_code_fk': 'USA'
         }
     ])]
-
 
 
     # Execute the insert statement

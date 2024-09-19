@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from data.get_table_from_db import get_table
+from backend.get_table_from_db import get_table
+
 app = FastAPI()
 
 origins = [

@@ -1,10 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Table, Column, ForeignKey
 from sqlalchemy import Text, Boolean, SmallInteger, UUID, TIMESTAMP, CHAR, VARCHAR
 import uuid
-from db_auth_cred import user, password, host, port, database
-
-# PostgreSQL connection string format
-connection_string = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+from backend.db_auth_cred import connection_string
 
 engine = create_engine(connection_string)
 
