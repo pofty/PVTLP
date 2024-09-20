@@ -11,7 +11,10 @@ export const TimestampField = ({timestamp, setTimestamp}) => (
             <DatePicker
                 showIcon
                 selected={timestamp}
-                onChange={(date) => setTimestamp(date)}
+onChange={(date) => {
+    setTimestamp(date);
+    console.log(date);
+}}
                 showTimeSelect
                 dateFormat="Pp"
                 minDate={new Date('2010-01-01')}

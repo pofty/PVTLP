@@ -10,11 +10,11 @@ import Flag from "react-world-flags";
 import {API_Endpoint} from "../utils/api_endpoints";
 import {useNavigate} from "react-router-dom";
 
-    export function getCountryCell(value) {
-        return (
-            <Flag className="rounded border-1 " code={value} height="10" width="35"/>
-        );
-    }
+export function getCountryCell(value) {
+    return (
+        <Flag className="rounded border-1 " code={value} height="10" width="35"/>
+    );
+}
 
 
 export function getStatusBadge(value) {
@@ -55,9 +55,9 @@ export default function TransactionsTable() {
             console.error("Error fetching customers: ", error);
         });
         getCallToBackend(API_Endpoint.Titles, Title)            .then((titles) => {
-                setTitles(titles);
-                console.log("titles: " + titles);
-            }).catch((error) => {
+            setTitles(titles);
+            console.log("titles: " + titles);
+        }).catch((error) => {
             console.error("Error fetching titles: ", error);
         });
     }, []);
@@ -176,36 +176,36 @@ export default function TransactionsTable() {
         </BackgroundGradient>
     );
     function ActionsCell({transactionId}) {
-    const handleEditClick = () => {
-        console.log(`Edit clicked for transaction ID: ${transactionId}`);
-    };
+        const handleEditClick = () => {
+            console.log(`Edit clicked for transaction ID: ${transactionId}`);
+        };
 
-    const handleDeleteClick = () => {
-        console.log(`Delete clicked for transaction ID: ${transactionId}`);
-        // api call to deleteCallToBackend() with transactionId
-        deleteCallToBackend(API_Endpoint.Delete_Transaction, transactionId)
-            .then((response) => {
-                console.log("Transaction deleted call was sent successfully: ", response);
-                // rerender the table
-                const tempTransactions = transactions.filter(transaction => transaction.transaction_id_pk !== transactionId);
-                setTransactions(tempTransactions);
-            })
-            .catch((error) => {
-                console.error("Error deleting transaction: ", error);
-            });
+        const handleDeleteClick = () => {
+            console.log(`Delete clicked for transaction ID: ${transactionId}`);
+            // api call to deleteCallToBackend() with transactionId
+            deleteCallToBackend(API_Endpoint.Delete_Transaction, transactionId)
+                .then((response) => {
+                    console.log("Transaction deleted call was sent successfully: ", response);
+                    // rerender the table
+                    const tempTransactions = transactions.filter(transaction => transaction.transaction_id_pk !== transactionId);
+                    setTransactions(tempTransactions);
+                })
+                .catch((error) => {
+                    console.error("Error deleting transaction: ", error);
+                });
 
+        }
+
+        return (
+            <Flex gap="1">
+                <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
+                    <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
+                </IconButton>
+                <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
+                    <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
+                </IconButton>
+            </Flex>
+        );
     }
-
-    return (
-        <Flex gap="1">
-            <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
-                <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
-            </IconButton>
-            <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
-                <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
-            </IconButton>
-        </Flex>
-    );
-}
 }
 

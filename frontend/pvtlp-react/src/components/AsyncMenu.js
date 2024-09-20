@@ -1,7 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import AsyncSelect from "react-select/async";
 
-export const AsyncSelectField = ({label, loadOptions, value, onChange, id, fullRow}) => {
+export const AsyncSelectField = ({fieldName, loadOptions, value, onChange, id, fullRow}) => {
     const [options, setOptions] = useState([]);
 
     const handleFocus = async () => {
@@ -13,10 +13,16 @@ export const AsyncSelectField = ({label, loadOptions, value, onChange, id, fullR
         onChange(option.value);
     };
 
+    useEffect(() => {
+        if (value !== undefined) {
+            handleFocus();
+        }
+    }, [value]);
+
     return (
         <div className={fullRow ? "sm:col-span-2": ""}>
             <label htmlFor={id} className="block text-sm font-semibold leading-6 text-gray-900">
-                {label}
+                {fieldName}
             </label>
             <div className="mt-2.5">
                 <AsyncSelect

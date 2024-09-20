@@ -15,22 +15,24 @@ import {BackgroundGradient} from "../components/background-gradient";
 import {CalloutMessage} from "../components/CalloutMessage";
 import {AsyncSelectField} from "../components/AsyncMenu";
 
-const Form = ({agreed, setAgreed}) => {
-    const [customerId, setCustomerId] = useState(null);
-    const [numberOfAttempts, setNumberOfAttempts] = useState(1);
-    const [timestamp, setTimestamp] = useState(new Date());
-    const [mfaStatus, setMfaStatus] = useState('');
-    const [transactionStatus, setTransactionStatus] = useState('');
-    const [titleId, setTitleId] = useState(null);
-    const [currencyCode, setCurrencyCode] = useState('');
-    const [countryCode, setCountryCode] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('');
-    const [amount, setAmount] = useState(1);
-    const [isCalloutVisible, setIsCalloutVisible] = useState(false);
-    const [calloutMessage, setCalloutMessage] = useState("");
-    const [calloutColor, setCalloutColor] = useState("red");
+const Form = ({
+    customerId, setCustomerId,
+    numberOfAttempts, setNumberOfAttempts,
+    timestamp, setTimestamp,
+    mfaStatus, setMfaStatus,
+    transactionStatus, setTransactionStatus,
+    titleId, setTitleId,
+    currencyCode, setCurrencyCode,
+    countryCode, setCountryCode,
+    paymentMethod, setPaymentMethod,
+    amount, setAmount,
+    isCalloutVisible, setIsCalloutVisible,
+    calloutMessage, setCalloutMessage,
+    calloutColor, setCalloutColor,
+    agreed, setAgreed,
+    isSubmitButtonEnabled, setIsSubmitButton
+}) => {
 
-    const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false)
 
     const loadCustomerOptions = async () => {
         const customers = await getCallToBackend(API_Endpoint.Customers, Customer);
@@ -49,6 +51,7 @@ const Form = ({agreed, setAgreed}) => {
             )
         }));
     };
+
     const loadTitleOptions = async () => {
         const titles = await getCallToBackend("titles", Title);
         return titles.map((title) => ({
@@ -134,7 +137,7 @@ const Form = ({agreed, setAgreed}) => {
             return [];
         }
     }
-      useEffect(() => {
+    useEffect(() => {
         validateForm();
     }, [customerId, titleId, countryCode, currencyCode, paymentMethod, mfaStatus, transactionStatus, amount, timestamp, agreed]);
 
@@ -147,74 +150,83 @@ const Form = ({agreed, setAgreed}) => {
         }
     }
 
-function postTransaction() {
-    const transaction = {
-        customer_id_fk: customerId,
-        title_id_fk: titleId,
-        country_code_fk: countryCode,
-        currency_code_fk: currencyCode,
-        payment_method_fk: paymentMethod,
-        transaction_status_fk: transactionStatus,
-        amount: amount,
-        timestamp: timestamp,
-        number_of_attempts: numberOfAttempts,
-        mfa_status_fk: mfaStatus
-    };
+    function postTransaction() {
+        const transaction = {
+            customer_id_fk: customerId,
+            title_id_fk: titleId,
+            country_code_fk: countryCode,
+            currency_code_fk: currencyCode,
+            payment_method_fk: paymentMethod,
+            transaction_status_fk: transactionStatus,
+            amount: amount,
+            timestamp: timestamp,
+            number_of_attempts: numberOfAttempts,
+            mfa_status_fk: mfaStatus
+        };
 
-    console.log("Posting transaction: ", transaction);
-    postCallToBackend(API_Endpoint.Create_Transaction, transaction).then(r => {
-        console.log("Transaction posted: ", r);
-        setIsCalloutVisible(true);
-        setCalloutColor("green");
-        setCalloutMessage("Transaction posted successfully, Transaction ID: " + r);
-    }).catch(error => {
-        console.error("Error posting transaction: ", error);
-        setIsCalloutVisible(true);
-        setCalloutMessage("Error posting transaction");
-    });
-}
+        console.log("Posting transaction: ", transaction);
+        postCallToBackend(API_Endpoint.Create_Transaction, transaction).then(r => {
+            console.log("Transaction posted: ", r);
+            setIsCalloutVisible(true);
+            setCalloutColor("green");
+            setCalloutMessage("Transaction posted successfully, Transaction ID: " + r);
+        }).catch(error => {
+            console.error("Error posting transaction: ", error);
+            setIsCalloutVisible(true);
+            setCalloutMessage("Error posting transaction");
+        });
+    }
 
     function SubmitFormButton() {
         return (
-        <div className="sm:col-span-2">
-            <Button variant="solid" className={`mt-2 w-full shadow-sm`} disabled={!isSubmitButtonEnabled} type="submit">
-                {isSubmitButtonEnabled ? "Submit" :  <Spinner/>}
-                {isSubmitButtonEnabled ? "" : "fill in all fields"}
-            </Button>
-        </div>
-    );
+            <div className="sm:col-span-2">
+                <Button variant="solid" className={`mt-2 w-full shadow-sm`} disabled={!isSubmitButtonEnabled}
+                        type="submit">
+                    {isSubmitButtonEnabled ? "Submit" : <Spinner/>}
+                    {isSubmitButtonEnabled ? "" : "fill in all fields"}
+                </Button>
+            </div>
+        );
     }
 
     return (
-<form onSubmit={(e) => { e.preventDefault(); postTransaction(); }} method="POST" className="shadow-lg mx-auto mt-8 max-w-xl ">            <BackgroundGradient>
+        <form onSubmit={(e) => {
+            e.preventDefault();
+            postTransaction();
+        }} method="POST" className="shadow-lg mx-auto mt-8 max-w-xl ">
+            <BackgroundGradient>
                 <div className="rounded-md grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 p-5 bg-white">
-                    <CalloutMessage message={calloutMessage} visible={isCalloutVisible} setVisibility={setIsCalloutVisible} calloutColor={calloutColor}/>
+                    <CalloutMessage message={calloutMessage} visible={isCalloutVisible}
+                                    setVisibility={setIsCalloutVisible} calloutColor={calloutColor}/>
 
-                    <AsyncSelectField label="Customer" loadOptions={loadCustomerOptions} value={customerId}
+                    <AsyncSelectField fieldName="Customer" loadOptions={loadCustomerOptions} value={customerId}
                                       onChange={setCustomerId} id="customer-idv" fullRow={true}/>
                     <AsyncSelectField label="Title" loadOptions={loadTitleOptions} value={titleId} onChange={setTitleId}
                                       id="title-id" fullRow={true}/>
-                    <AsyncSelectField label="Country Of transaction" loadOptions={loadCountriesMethodOptions}
+                    <AsyncSelectField fieldName="Country Of transaction" loadOptions={loadCountriesMethodOptions}
                                       value={countryCode} onChange={setCountryCode}
                                       id="country-of-transaction"/>
-                    <AsyncSelectField label="Currency" loadOptions={loadCurrencyOptions} value={currencyCode}
+                    <AsyncSelectField fieldName="Currency" loadOptions={loadCurrencyOptions} value={currencyCode}
                                       onChange={setCurrencyCode}
                                       id="currency"/>
-                    <AsyncSelectField label="Payment Method" loadOptions={loadPaymentMethodOptions}
+                    <AsyncSelectField fieldName="Payment Method" loadOptions={loadPaymentMethodOptions}
                                       value={paymentMethod} onChange={setPaymentMethod}
                                       id="payment-method"/>
-                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={1} max={200} setCalloutVisibility={setIsCalloutVisible} setCalloutMessage={setCalloutMessage} setCalloutColor={setCalloutColor}/>
-                    <DropDownSelectMenu label="MFA Status" loadOptions={loadMfaStatusOptions} value={mfaStatus}
+                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={1} max={200}
+                                 setCalloutVisibility={setIsCalloutVisible} setCalloutMessage={setCalloutMessage}
+                                 setCalloutColor={setCalloutColor}/>
+                    <DropDownSelectMenu fieldName="MFA Status" loadOptions={loadMfaStatusOptions} value={mfaStatus}
                                         onChange={setMfaStatus}
                                         id="mfa-status"/>
-                    <DropDownSelectMenu label="Transaction Status" loadOptions={loadTransactionStatusOptions}
+                    <DropDownSelectMenu fieldName="Transaction Status" loadOptions={loadTransactionStatusOptions}
                                         value={transactionStatus}
                                         onChange={setTransactionStatus} id="transaction-status"/>
                     <NumberField fieldName={"Number of Attempts"} number={numberOfAttempts}
-                                 setNumber={setNumberOfAttempts} min={1} max={10} calloutVisiblity={isCalloutVisible} setCalloutMessage={setIsCalloutVisible} setCalloutColor={setCalloutColor}/>
+                                 setNumber={setNumberOfAttempts} min={1} max={10} setCalloutVisibility={setIsCalloutVisible}
+                                 setCalloutMessage={setCalloutMessage} setCalloutColor={setCalloutColor}/>
                     <TimestampField timestamp={timestamp} setTimestamp={setTimestamp}/>
                     <AgreementField agreed={agreed} setAgreed={setAgreed}/>
-                    <SubmitFormButton />
+                    <SubmitFormButton/>
                 </div>
 
             </BackgroundGradient>
@@ -223,8 +235,22 @@ function postTransaction() {
     );
 };
 
-const CreateTransaction = () => {
+const TransactionTable = ({passedCustomerId, passedNumberOfAttempts, passedTimestamp, passedMfaStatus, passedTransactionStatus, passedTitleId, passedCurrencyCode, passedCountryCode, passedPaymentMethod, passedAmount, passedIsCalloutVisible, passedCalloutMessage}) => {
+    const [customerId, setCustomerId] = useState(passedCustomerId);
+    const [numberOfAttempts, setNumberOfAttempts] = useState(passedNumberOfAttempts);
+    const [timestamp, setTimestamp] = useState(passedTimestamp);
+    const [mfaStatus, setMfaStatus] = useState(passedMfaStatus);
+    const [transactionStatus, setTransactionStatus] = useState(passedTransactionStatus);
+    const [titleId, setTitleId] = useState(passedTitleId);
+    const [currencyCode, setCurrencyCode] = useState(passedCurrencyCode);
+    const [countryCode, setCountryCode] = useState(passedCountryCode);
+    const [paymentMethod, setPaymentMethod] = useState(passedPaymentMethod);
+    const [amount, setAmount] = useState(passedAmount);
+    const [isCalloutVisible, setIsCalloutVisible] = useState(passedIsCalloutVisible);
+    const [calloutMessage, setCalloutMessage] = useState(passedCalloutMessage);
+    const [calloutColor, setCalloutColor] = useState("purple");
     const [agreed, setAgreed] = useState(false);
+    const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false);
 
     return (
         <div className="isolate bg-white">
@@ -236,8 +262,38 @@ const CreateTransaction = () => {
                 </div>
             </div>
             <Header/>
-            <Form agreed={agreed} setAgreed={setAgreed}/>
-        </div>
+<Form
+    customerId={customerId}
+    setCustomerId={setCustomerId}
+    numberOfAttempts={numberOfAttempts}
+    setNumberOfAttempts={setNumberOfAttempts}
+    timestamp={timestamp}
+    setTimestamp={setTimestamp}
+    mfaStatus={mfaStatus}
+    setMfaStatus={setMfaStatus}
+    transactionStatus={transactionStatus}
+    setTransactionStatus={setTransactionStatus}
+    titleId={titleId}
+    setTitleId={setTitleId}
+    currencyCode={currencyCode}
+    setCurrencyCode={setCurrencyCode}
+    countryCode={countryCode}
+    setCountryCode={setCountryCode}
+    paymentMethod={paymentMethod}
+    setPaymentMethod={setPaymentMethod}
+    amount={amount}
+    setAmount={setAmount}
+    isCalloutVisible={isCalloutVisible}
+    setIsCalloutVisible={setIsCalloutVisible}
+    calloutMessage={calloutMessage}
+    setCalloutMessage={setCalloutMessage}
+    calloutColor={calloutColor}
+    setCalloutColor={setCalloutColor}
+    agreed={agreed}
+    setAgreed={setAgreed}
+    isSubmitButtonEnabled={isSubmitButtonEnabled}
+    setIsSubmitButton={setIsSubmitButton}
+/>        </div>
     );
 };
 
@@ -263,7 +319,7 @@ function GetDropDownItemColour(value) {
     return status_to_color[value] || 'white';
 }
 
-function DropDownSelectMenu({label, loadOptions, value, onChange, id}) {
+function DropDownSelectMenu({fieldName, loadOptions, value, onChange, id}) {
     const [menuColor, setMenuColor] = useState('gray');
     const [options, setOptions] = useState([]);
 
@@ -286,10 +342,16 @@ function DropDownSelectMenu({label, loadOptions, value, onChange, id}) {
         setMenuColor(GetDropDownItemColour(selectedValue));
     };
 
+    useEffect(() => {
+        if (value) {
+            setMenuColor(GetDropDownItemColour(value));
+        }
+    } , [value]);
+
     return (
         <div>
             <label htmlFor={id} className="block text-sm font-semibold text-gray-900 mb-2">
-                {label}
+                {fieldName}
             </label>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
@@ -313,4 +375,4 @@ function DropDownSelectMenu({label, loadOptions, value, onChange, id}) {
     );
 }
 
-export default CreateTransaction;
+export default TransactionTable;
