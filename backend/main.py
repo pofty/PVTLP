@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.get_table_from_db import get_table
 from backend.post_record_to_db import post_transaction
+from backend.delete_record_from_db import delete_record
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -90,6 +91,9 @@ async def post_transactions(transaction: Transaction):
                             transaction.amount)
 
 
-@app.post("/test")
-async def test():
-    return "test"
+# DELETE APIs
+
+@app.delete("/deletetransaction/{transaction_id}")
+async def delete_transaction(transaction_id: str):
+    return delete_record("transaction", transaction_id)
+

@@ -40,3 +40,17 @@ export const postCallToBackend = async (apiEndPoint: string, data: any) => {
         throw error;
     }
 }
+
+export const deleteCallToBackend = async (apiEndPoint: string, pk: string) => {
+    console.log('deleteCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
+    let json;
+    try {
+        const response = await apiCallBackend(baseUrl + apiEndPoint + '/' + pk, 'DELETE');
+        json = JSON.stringify(response);
+        console.log('data retrieved: ', json); // Log to check the transactions
+        return json;
+    } catch (error) {
+        console.error('Failed to fetch and parse Endpoint of: ' + apiEndPoint, error);
+        throw error;
+    }
+}

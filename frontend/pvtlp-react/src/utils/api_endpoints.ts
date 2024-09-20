@@ -8,4 +8,5 @@ export enum API_Endpoint {
     Transaction_Statuses = 'transaction_statuses',
     Payment_Methods = 'payment_methods',
     Create_Transaction = 'createtransaction',
+    Delete_Transaction = 'deletetransaction',
 }
