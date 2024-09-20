@@ -1,9 +1,7 @@
 import React from 'react';
-import logo from './logo.svg';
 import {Button, Theme, Text, Flex} from '@radix-ui/themes';
 // import Auth from "./lib/Auth";
 import NavBar from "./components/NavBar";
-import Example from "src/forms/TransactionTable";
 import TransactionsTable from "./tables/TransactionsTable";
 import TransactionTable from "src/forms/TransactionTable";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';

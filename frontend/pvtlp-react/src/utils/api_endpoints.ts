@@ -2,6 +2,7 @@ export enum API_Endpoint {
     Customers = 'customers',
     Transactions = 'transactions',
     Titles = 'titles',
+    Is_Admin = 'isadmin',
     Currencies = 'currencies',
     Countries = 'countries',
     MFA_Statues = 'mfa_statuses',

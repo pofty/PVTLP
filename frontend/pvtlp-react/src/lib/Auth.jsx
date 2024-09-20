@@ -6,9 +6,11 @@ import { Button } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
 
+
 export default function Auth() {
     const { setUserName } = useUser();
     const navigate = useNavigate();
+
 
     return (
         <Authenticator>
@@ -23,6 +25,8 @@ export default function Auth() {
 
 export function SignOut({ setUserName }) {
     const { signOut } = useAuthenticator();
+    const navigate = useNavigate();
+
     return (
         <MenuItem>
             <div className="flex justify-center items-center">
@@ -30,7 +34,7 @@ export function SignOut({ setUserName }) {
                     onClick={() => {
                         setUserName(undefined);
                         signOut();
-                        window.location.reload();
+                        navigate('/');
                     }}
                     type="Sign Out"
                     variant="solid"

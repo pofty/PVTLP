@@ -83,6 +83,11 @@ class Transaction(BaseModel):
     number_of_attempts: int
     mfa_status_fk: str
 
+@app.get("/isadmin")
+async def is_admin(jwt_token: str):
+    decoded_token = jwt_handling.decode_jwt_token(jwt_token)
+    username = decoded_token["cognito:username"]
+    return user_auth.is_admin(username)
 
 # Post APIs
 @app.post("/createtransaction")

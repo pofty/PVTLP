@@ -5,7 +5,7 @@ import {BackgroundGradient} from "../components/background-gradient";
 import {Flex, IconButton, Button, Badge, } from "@radix-ui/themes";
 import {Pencil1Icon as EditIcon, PlusIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
-import {getCallToBackend, deleteCallToBackend} from "../utils/api_call_backend";
+import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBackend} from "../utils/api_call_backend";
 import Flag from "react-world-flags";
 import {API_Endpoint} from "../utils/api_endpoints";
 import {useNavigate} from "react-router-dom";
@@ -36,13 +36,19 @@ export default function TransactionsTable() {
     const [transactions, setTransactions] = useState([]);
     const [titles, setTitles] = useState([]);
     const [customers, setCustomers] = useState([Customer, ]);
+    const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
+        isAdminGetCallToBackend()
+            .then((isAdmin) => {
+                setIsAdmin(isAdmin);
+                console.log("isAdmin: " + isAdmin);
+            })
         getCallToBackend(API_Endpoint.Transactions, Transaction)
-            .then((data) => {
-                setTransactions(data);
-                console.log("transactions: " + data);
+            .then((transactions) => {
+                setTransactions(transactions);
+                console.log("transactions: " + transactions);
             })
             .catch((error) => {
                 console.error("Error fetching transactions: ", error);
@@ -54,7 +60,7 @@ export default function TransactionsTable() {
             }).catch((error) => {
             console.error("Error fetching customers: ", error);
         });
-        getCallToBackend(API_Endpoint.Titles, Title)            .then((titles) => {
+        getCallToBackend(API_Endpoint.Titles, Title).then((titles) => {
             setTitles(titles);
             console.log("titles: " + titles);
         }).catch((error) => {
@@ -201,9 +207,9 @@ export default function TransactionsTable() {
                 <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
                     <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
                 </IconButton>
-                <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
+                {isAdmin && <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
                     <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
-                </IconButton>
+                </IconButton>}
             </Flex>
         );
     }

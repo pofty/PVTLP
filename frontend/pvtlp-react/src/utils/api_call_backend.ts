@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {fetchAuthSession} from "aws-amplify/auth";
+import {API_Endpoint} from "./api_endpoints";
 
 const baseUrl = 'http://18.132.89.253:8000/';
 
@@ -12,6 +13,24 @@ export const apiCallBackend = async (url: string, method: string, data?: any) =>
 
     return response.data;
 };
+
+export const isAdminGetCallToBackend = async () => {
+    let apiEndPoint = API_Endpoint.Is_Admin;
+    console.log('isAdminGetCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
+    let json;
+    const jwtToken = await getJwtToken();
+    let fullUrl = baseUrl + apiEndPoint + '?jwt_token=' + jwtToken;
+    console.log('fullUrl: ', fullUrl);
+    try {
+        const response = await apiCallBackend(fullUrl, 'GET');
+        json = JSON.stringify(response);
+        console.log('data retrieved: ', json); // Log to check the transactions
+        return json;
+    } catch (error) {
+        console.error('Failed to fetch and parse Endpoint of: ' + apiEndPoint, error);
+        throw error;
+    }
+}
 
 export const getCallToBackend = async (apiEndPoint: string, dataType: any) => {
     console.log('getCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
@@ -59,7 +78,7 @@ export const deleteCallToBackend = async (apiEndPoint: string, pk: string) => {
     }
 }
 
-async function getJwtToken() {
+export async function getJwtToken() {
     const session = await fetchAuthSession();
     if (session.tokens && session.tokens.idToken) {
         const jwtToken = session.tokens.idToken.toString();
