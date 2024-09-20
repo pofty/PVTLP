@@ -33,7 +33,7 @@ export function getStatusBadge(value) {
 
 export default function TransactionsTable() {
     const [page, setPage] = React.useState(1);
-    const [data, setData] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [titles, setTitles] = useState([]);
     const [customers, setCustomers] = useState([Customer, ]);
     const navigate = useNavigate();
@@ -41,8 +41,8 @@ export default function TransactionsTable() {
     useEffect(() => {
         getCallToBackend(API_Endpoint.Transactions, Transaction)
             .then((data) => {
-                setData(data);
-                console.log("data: " + data);
+                setTransactions(data);
+                console.log("transactions: " + data);
             })
             .catch((error) => {
                 console.error("Error fetching transactions: ", error);
@@ -64,14 +64,14 @@ export default function TransactionsTable() {
 
     const rowsPerPage = 4;
 
-    const pages = Math.ceil(data.length / rowsPerPage);
+    const pages = Math.ceil(transactions.length / rowsPerPage);
 
     const items = React.useMemo(() => {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
 
-        return data.slice(start, end);
-    }, [page, data]);
+        return transactions.slice(start, end);
+    }, [page, transactions]);
 
     function getCustomerCell(value) {
         const customer = customers.find(c => c.customer_id_pk === value);
@@ -160,7 +160,7 @@ export default function TransactionsTable() {
                         <TableColumn className="bg-black text-white" key={item.name}>{item.name} </TableColumn>
                     ))}
                 </TableHeader>
-                <TableBody emptyContent={"Loading... or no data found"} items={items}>
+                <TableBody emptyContent={"Loading... or no transactions found"} items={items}>
                     {(item) => (
                         <TableRow key={item.transaction_id_pk}>
                             {columns.map((column) => (
@@ -175,9 +175,7 @@ export default function TransactionsTable() {
             </Table>
         </BackgroundGradient>
     );
-}
-
-function ActionsCell({transactionId}) {
+    function ActionsCell({transactionId}) {
     const handleEditClick = () => {
         console.log(`Edit clicked for transaction ID: ${transactionId}`);
     };
@@ -187,7 +185,10 @@ function ActionsCell({transactionId}) {
         // api call to deleteCallToBackend() with transactionId
         deleteCallToBackend(API_Endpoint.Delete_Transaction, transactionId)
             .then((response) => {
-                console.log("Transaction deleted successfully: ", response);
+                console.log("Transaction deleted call was sent successfully: ", response);
+                // rerender the table
+                const tempTransactions = transactions.filter(transaction => transaction.transaction_id_pk !== transactionId);
+                setTransactions(tempTransactions);
             })
             .catch((error) => {
                 console.error("Error deleting transaction: ", error);
@@ -206,3 +207,5 @@ function ActionsCell({transactionId}) {
         </Flex>
     );
 }
+}
+

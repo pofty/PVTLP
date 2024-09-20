@@ -8,7 +8,6 @@ import {useNavigate} from "react-router-dom";
 
 const navigationItems = [
     { name: 'Transactions', href: '/TransactionsPage' },
-    { name: 'Customers', href: '#' },
 ];
 
 function classNames(...classes) {

@@ -4,6 +4,8 @@ from backend.get_table_from_db import get_table
 from backend.post_record_to_db import post_transaction
 from backend.delete_record_from_db import delete_record
 from pydantic import BaseModel
+import backend.jwt_handling as jwt_handling
+import backend.user_auth as user_auth
 
 app = FastAPI()
 
@@ -94,6 +96,15 @@ async def post_transactions(transaction: Transaction):
 # DELETE APIs
 
 @app.delete("/deletetransaction/{transaction_id}")
-async def delete_transaction(transaction_id: str):
-    return delete_record("transaction", transaction_id)
-
+async def delete_transaction(transaction_id: str, jwt_token: str):
+    #print("JWT token is: ", jwt_token)
+    # TODO: check jwt format validity
+    decoded_token = jwt_handling.decode_jwt_token(jwt_token)
+    print("Decoded token is: ", decoded_token)
+    username = decoded_token["cognito:username"]
+    print("Username is: ", username)
+    is_admin = user_auth.is_admin(username)
+    if not is_admin:
+        return f"{username} is not authorized to delete a transaction"
+    else:
+        return delete_record("transaction", transaction_id)

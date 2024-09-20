@@ -29,4 +29,4 @@ def get_table(table_name: str):
         return data
 
 
-print(get_table("transaction"))
+#print(get_table("pvtlp_user"))

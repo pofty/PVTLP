@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {fetchAuthSession} from "aws-amplify/auth";
 
 const baseUrl = 'http://18.132.89.253:8000/';
 
@@ -42,15 +43,29 @@ export const postCallToBackend = async (apiEndPoint: string, data: any) => {
 }
 
 export const deleteCallToBackend = async (apiEndPoint: string, pk: string) => {
+    const jwtToken = await getJwtToken();
     console.log('deleteCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
     let json;
+    let fullUrl = baseUrl + apiEndPoint + '/' + pk + '?jwt_token=' + jwtToken;
     try {
-        const response = await apiCallBackend(baseUrl + apiEndPoint + '/' + pk, 'DELETE');
+        console.log('fullUrl: ', fullUrl);
+        const response = await apiCallBackend(fullUrl, 'DELETE');
         json = JSON.stringify(response);
         console.log('data retrieved: ', json); // Log to check the transactions
         return json;
     } catch (error) {
         console.error('Failed to fetch and parse Endpoint of: ' + apiEndPoint, error);
         throw error;
+    }
+}
+
+async function getJwtToken() {
+    const session = await fetchAuthSession();
+    if (session.tokens && session.tokens.idToken) {
+        const jwtToken = session.tokens.idToken.toString();
+        console.log("id token G", jwtToken);
+        return jwtToken;
+    } else {
+        console.error("Tokens or idToken is undefined");
     }
 }
