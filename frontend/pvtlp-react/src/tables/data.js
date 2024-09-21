@@ -1,16 +1,16 @@
 const columns = [
-    {name: "Transaction Id", uid: "transaction_id_pk"},
-    {name: "Transaction Status", uid: "transaction_status_fk"},
-    {name: "Timestamp", uid: "timestamp"},
-    {name: "Customer", uid: "customer_id_fk"},
-    {name: "Number of Attempts", uid: "number_of_attempts"},
-    {name: "MFA Status", uid: "mfa_status_fk"},
-    {name: "Title", uid: "title_id_fk"},
-    {name: "Amount", uid: "amount"},
-    {name: "Country", uid: "country_code_fk"},
-    {name: "Currency", uid: "currency_code_fk"},
-    {name: "Payment Method", uid: "payment_method_fk"},
-    {name: "Actions", uid: "actions"},
+{name: "TransactionId", uid: "transaction_id_pk"},
+{name: "TransactionStatus", uid: "transaction_status_fk"},
+{name: "Timestamp", uid: "timestamp"},
+{name: "Customer", uid: "customer_id_fk"},
+{name: "NumberOfAttempts", uid: "number_of_attempts"},
+{name: "MFAStatus", uid: "mfa_status_fk"},
+{name: "Title", uid: "title_id_fk"},
+{name: "Amount", uid: "amount"},
+{name: "Country", uid: "country_code_fk"},
+{name: "Currency", uid: "currency_code_fk"},
+{name: "PaymentMethod", uid: "payment_method_fk"},
+{name: "Actions", uid: "actions"},
 ];
 
 export class Transaction {

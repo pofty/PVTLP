@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
@@ -13,7 +13,10 @@ import {EditFormContext} from "../EditFormContext";
 
 export function getCountryCell(value) {
     return (
-        <Flag className="rounded border-1 " code={value} height="10" width="35"/>
+        <Flex justify={"center"}>
+            <Flag className="rounded border-1 " code={value} height="10" width="35"/>
+
+        </Flex>
     );
 }
 
@@ -40,7 +43,7 @@ export default function TransactionsTable() {
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchData = async () => {
             try {
                 const [isAdmin, transactions, customers, titles] = await Promise.all([
@@ -82,18 +85,14 @@ export default function TransactionsTable() {
     function getCustomerCell(value) {
         const customer = customers.find(c => c.customer_id_pk === value);
         return customer ? (
-            <Flex gap="3" justify="start">
-                <div>
-                    <div className="bg-white">
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <PersonIcon style={{marginRight: '8px'}}/>
-                            <span>{`${customer.first_name} ${customer.last_name}`}</span>
-                        </div>
-                    </div>
-                    <div className="text-gray-500"> Home Region: {customer.home_country_code_fk}</div>
-                    <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>
-                </div>
+            <Flex direction={"column"} align={"center"}>
+                <Flex direction={'row'} justify={'center'}>
+                    <PersonIcon/>
+                    <span>{`${customer.first_name}\u00A0${customer.last_name}`}</span>                    </Flex>
+                <div className="text-gray-500" > Home Region: {customer.home_country_code_fk}</div>
+                <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>
             </Flex>
+
         ) : value;
     }
 
@@ -101,14 +100,12 @@ export default function TransactionsTable() {
         const title = titles.find(title => title.title_id_pk === value);
         console.log("title: GG" + title);
         return title ? (
-            <Flex gap="3" justify="start">
-                <div>
-                    <div className="bg-white">
-                        {`${title.name}`}
-                    </div>
-                    <div className="text-gray-500">
-                        ID: {title.title_id_pk}
-                    </div>
+            <Flex direction={"column"} >
+                <div className="bg-white">
+                    {`${title.name}`}
+                </div>
+                <div className="text-gray-500">
+                    ID: {title.title_id_pk}
                 </div>
             </Flex>
         ) : value;
@@ -137,11 +134,25 @@ export default function TransactionsTable() {
         );
     }
 
+    function TransactionTableRow({ item, columns, getTableCell, getKeyValue, ActionsCell }) {
+    return (
+        <TableRow key={item.transaction_id_pk} classNames=''>
+            {columns.map((column) => (
+                <TableCell key={column.uid} className="text-center">
+                    {(column.uid !== "actions") ? getTableCell(column.uid, getKeyValue(item, column.uid)) :
+                        <ActionsCell transactionId={item.transaction_id_pk}/>}
+                </TableCell>
+            ))}
+        </TableRow>
+    );
+}
+
     return (
         <BackgroundGradient className="rounded-[22px] sm:p-1 ">
             <Table
                 topContent={<CreateTransactionButton/>}
                 aria-label="Transactions Table"
+                layout="auto"
                 bottomContent={
                     <div className="flex w-full justify-center pointer-events-auto  ">
                         <Pagination
@@ -161,19 +172,20 @@ export default function TransactionsTable() {
                     </div>
                 }
                 classNames={{
-                    wrapper: "min-h-[222px]",
+                    wrapper: "min-h-[222px]"
                 }}
+
             >
                 <TableHeader>
                     {columns.map((item) => (
-                        <TableColumn className="bg-black text-white" key={item.name}>{item.name} </TableColumn>
+                        <TableColumn className="bg-black text-white text-center" key={item.name}>{item.name} </TableColumn>
                     ))}
                 </TableHeader>
-                <TableBody emptyContent={"Loading... or no transactions found"} items={items}>
+                <TableBody emptyContent={"Loading... or no transactions found"} items={items} className="">
                     {(item) => (
-                        <TableRow key={item.transaction_id_pk}>
+                        <TableRow key={item.transaction_id_pk} classNames=''>
                             {columns.map((column) => (
-                                <TableCell key={column.uid}>
+                                <TableCell key={column.uid} className="text-center">
                                     {(column.uid !== "actions") ? getTableCell(column.uid, getKeyValue(item, column.uid)) :
                                         <ActionsCell transactionId={item.transaction_id_pk}/>}
                                 </TableCell>
@@ -210,7 +222,7 @@ export default function TransactionsTable() {
         }
 
         return (
-            <Flex gap="1">
+            <Flex gap="1" direction={"row"} justify={'center'}>
                 <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
                     <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
                 </IconButton>
