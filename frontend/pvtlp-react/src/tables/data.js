@@ -81,7 +81,7 @@ export class TransactionFormProps {
         this.passedTransactionId = transaction.transaction_id_pk;
         this.passedCustomerId = transaction.customer_id_fk;
         this.passedAmount = transaction.amount;
-        this.passedCalloutMessage = "Edit transaction form is loaded";
+        this.passedCalloutMessage = "Transaction Form has loaded successfully!";
         this.passedCountryCode = transaction.country_code_fk;
         this.passedCurrencyCode = transaction.currency_code_fk;
         this.passedIsCalloutVisible = true;

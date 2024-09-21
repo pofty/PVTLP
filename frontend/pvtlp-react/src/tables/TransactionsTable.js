@@ -10,6 +10,8 @@ import Flag from "react-world-flags";
 import {API_Endpoint} from "../utils/api_endpoints";
 import {useNavigate} from "react-router-dom";
 import {EditFormContext} from "../EditFormContext";
+import {useUser} from "../UserContext";
+import useAuthRedirect from "../lib/useAuthRedirect";
 
 export function getCountryCell(value) {
     return (
@@ -35,11 +37,14 @@ export function getStatusBadge(value) {
 }
 
 export default function TransactionsTable() {
-    const { setTransactionProps } = useContext(EditFormContext);
+    const {userName} = useUser();
+    useAuthRedirect(userName);
+
+    const {setTransactionProps} = useContext(EditFormContext);
     const [page, setPage] = React.useState(1);
     const [transactions, setTransactions] = useState([]);
     const [titles, setTitles] = useState([]);
-    const [customers, setCustomers] = useState([Customer, ]);
+    const [customers, setCustomers] = useState([Customer,]);
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
@@ -88,8 +93,8 @@ export default function TransactionsTable() {
             <Flex direction={"column"} align={"center"}>
                 <Flex direction={'row'} justify={'center'}>
                     <PersonIcon/>
-                    <span>{`${customer.first_name}\u00A0${customer.last_name}`}</span>                    </Flex>
-                <div className="text-gray-500" > Home Region: {customer.home_country_code_fk}</div>
+                    <span>{`${customer.first_name}\u00A0${customer.last_name}`}</span> </Flex>
+                <div className="text-gray-500"> Home Region: {customer.home_country_code_fk}</div>
                 <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>
             </Flex>
 
@@ -100,7 +105,7 @@ export default function TransactionsTable() {
         const title = titles.find(title => title.title_id_pk === value);
         console.log("title: GG" + title);
         return title ? (
-            <Flex direction={"column"} >
+            <Flex direction={"column"}>
                 <div className="bg-white">
                     {`${title.name}`}
                 </div>
@@ -127,110 +132,102 @@ export default function TransactionsTable() {
         return (
             <div className='size-16'>
                 <Button color="gray" variant="outline" highContrast
-                        onClick={() => navigate("/CreateTransaction")} >
+                        onClick={() => navigate("/CreateTransaction")}>
                     <PlusIcon/> Create Transaction
                 </Button>
             </div>
         );
     }
 
-    function TransactionTableRow({ item, columns, getTableCell, getKeyValue, ActionsCell }) {
-    return (
-        <TableRow key={item.transaction_id_pk} classNames=''>
-            {columns.map((column) => (
-                <TableCell key={column.uid} className="text-center">
-                    {(column.uid !== "actions") ? getTableCell(column.uid, getKeyValue(item, column.uid)) :
-                        <ActionsCell transactionId={item.transaction_id_pk}/>}
-                </TableCell>
-            ))}
-        </TableRow>
-    );
-}
 
-    return (
-        <BackgroundGradient className="rounded-[22px] sm:p-1 ">
-            <Table
-                topContent={<CreateTransactionButton/>}
-                aria-label="Transactions Table"
-                layout="auto"
-                bottomContent={
-                    <div className="flex w-full justify-center pointer-events-auto  ">
-                        <Pagination
-                            classNames={{
-                                wrapper: "gap-0 overflow-visible rounded border-divider",
-                                item: "w-8 h-8 text-small rounded-none bg-transparent",
-                                cursor:
-                                    "bg-black from-default-500 to-default-800 dark:from-default-300 dark:to-default-100 text-white font-bold",
-                            }}
-                            isCompact
-                            showControls
-                            showShadow
-                            page={page}
-                            total={pages}
-                            onChange={(page) => setPage(page)}
-                        />
-                    </div>
-                }
-                classNames={{
-                    wrapper: "min-h-[222px]"
-                }}
-
-            >
-                <TableHeader>
-                    {columns.map((item) => (
-                        <TableColumn className="bg-black text-white text-center" key={item.name}>{item.name} </TableColumn>
-                    ))}
-                </TableHeader>
-                <TableBody emptyContent={"Loading... or no transactions found"} items={items} className="">
-                    {(item) => (
-                        <TableRow key={item.transaction_id_pk} classNames=''>
-                            {columns.map((column) => (
-                                <TableCell key={column.uid} className="text-center">
-                                    {(column.uid !== "actions") ? getTableCell(column.uid, getKeyValue(item, column.uid)) :
-                                        <ActionsCell transactionId={item.transaction_id_pk}/>}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </BackgroundGradient>
-    );
-    function ActionsCell({transactionId}) {
-        const handleEditClick = () => {
-            console.log(`Edit clicked for transaction ID: ${transactionId}`);
-            const transaction = transactions.find(transaction => transaction.transaction_id_pk === transactionId);
-            setTransactionProps(new TransactionFormProps(transaction));
-            console.log("transaction details sent to EditFormContext");
-            navigate("/EditTransaction");
-        };
-
-        const handleDeleteClick = () => {
-            console.log(`Delete clicked for transaction ID: ${transactionId}`);
-            // api call to deleteCallToBackend() with transactionId
-            deleteCallToBackend(API_Endpoint.Delete_Transaction, transactionId)
-                .then((response) => {
-                    console.log("Transaction deleted call was sent successfully: ", response);
-                    // rerender the table
-                    const tempTransactions = transactions.filter(transaction => transaction.transaction_id_pk !== transactionId);
-                    setTransactions(tempTransactions);
-                })
-                .catch((error) => {
-                    console.error("Error deleting transaction: ", error);
-                });
-
-        }
-
+    if (userName) {
         return (
-            <Flex gap="1" direction={"row"} justify={'center'}>
-                <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
-                    <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
-                </IconButton>
-                {isAdmin && <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
-                    <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200" />
-                </IconButton>}
-            </Flex>
+            <BackgroundGradient className="rounded-[22px] sm:p-1 ">
+                <Table
+                    topContent={<CreateTransactionButton/>}
+                    aria-label="Transactions Table"
+                    layout="auto"
+                    bottomContent={
+                        <div className="flex w-full justify-center pointer-events-auto  ">
+                            <Pagination
+                                classNames={{
+                                    wrapper: "gap-0 overflow-visible rounded border-divider",
+                                    item: "w-8 h-8 text-small rounded-none bg-transparent",
+                                    cursor:
+                                        "bg-black from-default-500 to-default-800 dark:from-default-300 dark:to-default-100 text-white font-bold",
+                                }}
+                                isCompact
+                                showControls
+                                showShadow
+                                page={page}
+                                total={pages}
+                                onChange={(page) => setPage(page)}
+                            />
+                        </div>
+                    }
+                    classNames={{
+                        wrapper: "min-h-[222px]"
+                    }}
+
+                >
+                    <TableHeader>
+                        {columns.map((item) => (
+                            <TableColumn className="bg-black text-white text-center"
+                                         key={item.name}>{item.name} </TableColumn>
+                        ))}
+                    </TableHeader>
+                    <TableBody emptyContent={"Loading... or no transactions found"} items={items} className="">
+                        {(item) => (
+                            <TableRow key={item.transaction_id_pk} classNames=''>
+                                {columns.map((column) => (
+                                    <TableCell key={column.uid} className="text-center">
+                                        {(column.uid !== "actions") ? getTableCell(column.uid, getKeyValue(item, column.uid)) :
+                                            <ActionsCell transactionId={item.transaction_id_pk}/>}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </BackgroundGradient>
         );
+
+        function ActionsCell({transactionId}) {
+            const handleEditClick = () => {
+                console.log(`Edit clicked for transaction ID: ${transactionId}`);
+                const transaction = transactions.find(transaction => transaction.transaction_id_pk === transactionId);
+                setTransactionProps(new TransactionFormProps(transaction));
+                console.log("transaction details sent to EditFormContext");
+                navigate("/EditTransaction");
+            };
+
+            const handleDeleteClick = () => {
+                console.log(`Delete clicked for transaction ID: ${transactionId}`);
+                // api call to deleteCallToBackend() with transactionId
+                deleteCallToBackend(API_Endpoint.Delete_Transaction, transactionId)
+                    .then((response) => {
+                        console.log("Transaction deleted call was sent successfully: ", response);
+                        // rerender the table
+                        const tempTransactions = transactions.filter(transaction => transaction.transaction_id_pk !== transactionId);
+                        setTransactions(tempTransactions);
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting transaction: ", error);
+                    });
+
+            }
+
+            return (
+                <Flex gap="1" direction={"row"} justify={'center'}>
+                    <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
+                        <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
+                    </IconButton>
+                    {isAdmin && <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
+                        <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
+                    </IconButton>}
+                </Flex>
+            );
+        }
     }
 }
 

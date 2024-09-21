@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useLayoutEffect} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Divider} from "@aws-amplify/ui-react";
 import {Flex, Text, DropdownMenu, Button, Select, Spinner, Badge} from "@radix-ui/themes";
@@ -17,6 +17,8 @@ import {AsyncSelectField} from "../components/AsyncMenu";
 import {EditFormContext, defaultTransactionFormProps} from "../EditFormContext";
 import {ArrowLeftIcon} from "@radix-ui/react-icons";
 import {useNavigate} from "react-router-dom";
+import {useUser} from "../UserContext";
+import useAuthRedirect from "../lib/useAuthRedirect";
 
 const Form = () => {
     const {transactionProps} = useContext(EditFormContext);
@@ -289,10 +291,7 @@ const Form = () => {
     );
 };
 
-export const TransactionForm = () => {
-    const {setTransactionProps} = useContext(EditFormContext);
-    setTransactionProps(defaultTransactionFormProps);
-
+function DefaultFormStructure(userName) {
     return (
         <div className="isolate bg-white">
             <div className="flex justify-start items-center px-8">
@@ -303,26 +302,27 @@ export const TransactionForm = () => {
                 </div>
             </div>
             <Header/>
-<Form/>        </div>
+            {userName ? <Form/> : null}
+        </div>
     );
+}
+
+export const TransactionForm = () => {
+    const { userName } = useUser();
+    useAuthRedirect(userName);
+
+    const {setTransactionProps} = useContext(EditFormContext);
+    setTransactionProps(defaultTransactionFormProps);
+
+    return DefaultFormStructure(userName);
 };
 
 
 export const EditTransactionForm = () => {
+    const { userName } = useUser();
+    useAuthRedirect(userName);
 
-    return (
-        <div className="isolate bg-white">
-            <div className="flex justify-start items-center px-8">
-                <div className="font-bold text-5xl mx-auto text-blue-500">
-                    Prime Video
-                    <FlipWords words={["Movies", "TV Shows", "Live Sport", "Entertainment"]}/>
-                    <br/>
-                </div>
-            </div>
-            <Header/>
-            <Form/>
-        </div>
-    );
+    return DefaultFormStructure(userName);
 };
 
 const Header = () => (
