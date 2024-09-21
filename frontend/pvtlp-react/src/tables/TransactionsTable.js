@@ -2,8 +2,8 @@ import React, {useContext, useEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
-import {Flex, IconButton, Button, Badge, } from "@radix-ui/themes";
-import {Pencil1Icon as EditIcon, PlusIcon} from "@radix-ui/react-icons";
+import {Flex, IconButton, Button, Badge } from "@radix-ui/themes";
+import {Pencil1Icon as EditIcon, PlusIcon, PersonIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBackend} from "../utils/api_call_backend";
 import Flag from "react-world-flags";
@@ -16,7 +16,6 @@ export function getCountryCell(value) {
         <Flag className="rounded border-1 " code={value} height="10" width="35"/>
     );
 }
-
 
 export function getStatusBadge(value) {
     const status_to_color = {
@@ -42,32 +41,31 @@ export default function TransactionsTable() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        isAdminGetCallToBackend()
-            .then((isAdmin) => {
+        const fetchData = async () => {
+            try {
+                const [isAdmin, transactions, customers, titles] = await Promise.all([
+                    isAdminGetCallToBackend(),
+                    getCallToBackend(API_Endpoint.Transactions, Transaction),
+                    getCallToBackend(API_Endpoint.Customers, Customer),
+                    getCallToBackend(API_Endpoint.Titles, Title)
+                ]);
+
                 setIsAdmin(isAdmin);
                 console.log("isAdmin: " + isAdmin);
-            })
-        getCallToBackend(API_Endpoint.Transactions, Transaction)
-            .then((transactions) => {
+
                 setTransactions(transactions);
                 console.log("transactions: " + transactions);
-            })
-            .catch((error) => {
-                console.error("Error fetching transactions: ", error);
-            });
-        getCallToBackend(API_Endpoint.Customers, Customer)
-            .then((customers) => {
+
                 setCustomers(customers);
                 console.log("customers: " + customers);
-            }).catch((error) => {
-            console.error("Error fetching customers: ", error);
-        });
-        getCallToBackend(API_Endpoint.Titles, Title).then((titles) => {
-            setTitles(titles);
-            console.log("titles: " + titles);
-        }).catch((error) => {
-            console.error("Error fetching titles: ", error);
-        });
+
+                setTitles(titles);
+                console.log("titles: " + titles);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        };
+        fetchData().then(() => console.log("Data fetched successfully"));
     }, []);
 
     const rowsPerPage = 4;
@@ -87,7 +85,10 @@ export default function TransactionsTable() {
             <Flex gap="3" justify="start">
                 <div>
                     <div className="bg-white">
-                        {`${customer.first_name} ${customer.last_name}`}
+                        <div style={{display: 'flex', alignItems: 'center'}}>
+                            <PersonIcon style={{marginRight: '8px'}}/>
+                            <span>{`${customer.first_name} ${customer.last_name}`}</span>
+                        </div>
                     </div>
                     <div className="text-gray-500"> Home Region: {customer.home_country_code_fk}</div>
                     <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>
