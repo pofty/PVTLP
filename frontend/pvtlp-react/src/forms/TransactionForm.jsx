@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Divider} from "@aws-amplify/ui-react";
-import {Flex, Text, DropdownMenu, Button, Select, Spinner} from "@radix-ui/themes";
+import {Flex, Text, DropdownMenu, Button, Select, Spinner, Badge} from "@radix-ui/themes";
 import {getCallToBackend, postCallToBackend} from '../utils/api_call_backend';
 import {FlipWords} from "../components/FlipWordsDemo";
 import {AgreementField} from "../components/AgreementField";
@@ -14,24 +14,25 @@ import {getCountryCell} from "../components/CoutryFlag";
 import {BackgroundGradient} from "../components/background-gradient";
 import {CalloutMessage} from "../components/CalloutMessage";
 import {AsyncSelectField} from "../components/AsyncMenu";
+import {EditFormContext, defaultTransactionFormProps} from "../EditFormContext";
 
-const Form = ({
-    customerId, setCustomerId,
-    numberOfAttempts, setNumberOfAttempts,
-    timestamp, setTimestamp,
-    mfaStatus, setMfaStatus,
-    transactionStatus, setTransactionStatus,
-    titleId, setTitleId,
-    currencyCode, setCurrencyCode,
-    countryCode, setCountryCode,
-    paymentMethod, setPaymentMethod,
-    amount, setAmount,
-    isCalloutVisible, setIsCalloutVisible,
-    calloutMessage, setCalloutMessage,
-    calloutColor, setCalloutColor,
-    agreed, setAgreed,
-    isSubmitButtonEnabled, setIsSubmitButton
-}) => {
+const Form = () => {
+    const {transactionProps} = useContext(EditFormContext);
+    const [customerId, setCustomerId] = useState(transactionProps.passedCustomerId);
+    const [numberOfAttempts, setNumberOfAttempts] = useState(transactionProps.passedNumberOfAttempts);
+    const [timestamp, setTimestamp] = useState(transactionProps.passedTimestamp);
+    const [mfaStatus, setMfaStatus] = useState(transactionProps.passedMfaStatus);
+    const [transactionStatus, setTransactionStatus] = useState(transactionProps.passedTransactionStatus);
+    const [titleId, setTitleId] = useState(transactionProps.passedTitleId);
+    const [currencyCode, setCurrencyCode] = useState(transactionProps.passedCurrencyCode);
+    const [countryCode, setCountryCode] = useState(transactionProps.passedCountryCode);
+    const [paymentMethod, setPaymentMethod] = useState(transactionProps.passedPaymentMethod);
+    const [amount, setAmount] = useState(transactionProps.passedAmount);
+    const [isCalloutVisible, setIsCalloutVisible] = useState(transactionProps.passedIsCalloutVisible);
+    const [calloutMessage, setCalloutMessage] = useState(transactionProps.passedCalloutMessage);
+    const [calloutColor, setCalloutColor] = useState("purple");
+    const [agreed, setAgreed] = useState(false);
+    const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false);
 
 
     const loadCustomerOptions = async () => {
@@ -178,11 +179,12 @@ const Form = ({
     }
 
     function SubmitFormButton() {
+        const submitButtonText = transactionProps.passedTransactionId ? "Update" : "Submit";
         return (
             <div className="sm:col-span-2">
                 <Button variant="solid" className={`mt-2 w-full shadow-sm`} disabled={!isSubmitButtonEnabled}
                         type="submit">
-                    {isSubmitButtonEnabled ? "Submit" : <Spinner/>}
+                    {isSubmitButtonEnabled ? submitButtonText : <Spinner/>}
                     {isSubmitButtonEnabled ? "" : "fill in all fields"}
                 </Button>
             </div>
@@ -197,7 +199,17 @@ const Form = ({
             <BackgroundGradient>
                 <div className="rounded-md grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 p-5 bg-white">
                     <CalloutMessage message={calloutMessage} visible={isCalloutVisible}
-                                    setVisibility={setIsCalloutVisible} calloutColor={calloutColor}/>
+                                    setVisibility={setIsCalloutVisible} calloutColor={calloutColor} duration={2000}/>
+
+                    {transactionProps.passedTransactionId ? (
+                        <CalloutMessage
+                            message={"Editing Transaction id: " + transactionProps.passedTransactionId}
+                            visible={true}
+                            setVisibility={setIsCalloutVisible}
+                            calloutColor={calloutColor}
+                            duration={0}
+                        />
+                    ) : null}
 
                     <AsyncSelectField fieldName="Customer" loadOptions={loadCustomerOptions} value={customerId}
                                       onChange={setCustomerId} id="customer-idv" fullRow={true}/>
@@ -235,22 +247,9 @@ const Form = ({
     );
 };
 
-const TransactionTable = ({passedCustomerId, passedNumberOfAttempts, passedTimestamp, passedMfaStatus, passedTransactionStatus, passedTitleId, passedCurrencyCode, passedCountryCode, passedPaymentMethod, passedAmount, passedIsCalloutVisible, passedCalloutMessage}) => {
-    const [customerId, setCustomerId] = useState(passedCustomerId);
-    const [numberOfAttempts, setNumberOfAttempts] = useState(passedNumberOfAttempts);
-    const [timestamp, setTimestamp] = useState(passedTimestamp);
-    const [mfaStatus, setMfaStatus] = useState(passedMfaStatus);
-    const [transactionStatus, setTransactionStatus] = useState(passedTransactionStatus);
-    const [titleId, setTitleId] = useState(passedTitleId);
-    const [currencyCode, setCurrencyCode] = useState(passedCurrencyCode);
-    const [countryCode, setCountryCode] = useState(passedCountryCode);
-    const [paymentMethod, setPaymentMethod] = useState(passedPaymentMethod);
-    const [amount, setAmount] = useState(passedAmount);
-    const [isCalloutVisible, setIsCalloutVisible] = useState(passedIsCalloutVisible);
-    const [calloutMessage, setCalloutMessage] = useState(passedCalloutMessage);
-    const [calloutColor, setCalloutColor] = useState("purple");
-    const [agreed, setAgreed] = useState(false);
-    const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false);
+export const TransactionForm = () => {
+    const {setTransactionProps} = useContext(EditFormContext);
+    setTransactionProps(defaultTransactionFormProps);
 
     return (
         <div className="isolate bg-white">
@@ -262,38 +261,25 @@ const TransactionTable = ({passedCustomerId, passedNumberOfAttempts, passedTimes
                 </div>
             </div>
             <Header/>
-<Form
-    customerId={customerId}
-    setCustomerId={setCustomerId}
-    numberOfAttempts={numberOfAttempts}
-    setNumberOfAttempts={setNumberOfAttempts}
-    timestamp={timestamp}
-    setTimestamp={setTimestamp}
-    mfaStatus={mfaStatus}
-    setMfaStatus={setMfaStatus}
-    transactionStatus={transactionStatus}
-    setTransactionStatus={setTransactionStatus}
-    titleId={titleId}
-    setTitleId={setTitleId}
-    currencyCode={currencyCode}
-    setCurrencyCode={setCurrencyCode}
-    countryCode={countryCode}
-    setCountryCode={setCountryCode}
-    paymentMethod={paymentMethod}
-    setPaymentMethod={setPaymentMethod}
-    amount={amount}
-    setAmount={setAmount}
-    isCalloutVisible={isCalloutVisible}
-    setIsCalloutVisible={setIsCalloutVisible}
-    calloutMessage={calloutMessage}
-    setCalloutMessage={setCalloutMessage}
-    calloutColor={calloutColor}
-    setCalloutColor={setCalloutColor}
-    agreed={agreed}
-    setAgreed={setAgreed}
-    isSubmitButtonEnabled={isSubmitButtonEnabled}
-    setIsSubmitButton={setIsSubmitButton}
-/>        </div>
+<Form/>        </div>
+    );
+};
+
+
+export const EditTransactionForm = () => {
+
+    return (
+        <div className="isolate bg-white">
+            <div className="flex justify-start items-center px-8">
+                <div className="font-bold text-5xl mx-auto text-blue-500">
+                    Prime Video
+                    <FlipWords words={["Movies", "TV Shows", "Live Sport", "Entertainment"]}/>
+                    <br/>
+                </div>
+            </div>
+            <Header/>
+            <Form/>
+        </div>
     );
 };
 
@@ -375,4 +361,4 @@ function DropDownSelectMenu({fieldName, loadOptions, value, onChange, id}) {
     );
 }
 
-export default TransactionTable;
+export default TransactionForm;

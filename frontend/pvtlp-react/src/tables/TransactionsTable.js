@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
-import {columns, Customer, Title, Transaction} from "./data";
+import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
 import {Flex, IconButton, Button, Badge, } from "@radix-ui/themes";
 import {Pencil1Icon as EditIcon, PlusIcon} from "@radix-ui/react-icons";
@@ -9,6 +9,7 @@ import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBack
 import Flag from "react-world-flags";
 import {API_Endpoint} from "../utils/api_endpoints";
 import {useNavigate} from "react-router-dom";
+import {EditFormContext} from "../EditFormContext";
 
 export function getCountryCell(value) {
     return (
@@ -32,6 +33,7 @@ export function getStatusBadge(value) {
 }
 
 export default function TransactionsTable() {
+    const { setTransactionProps } = useContext(EditFormContext);
     const [page, setPage] = React.useState(1);
     const [transactions, setTransactions] = useState([]);
     const [titles, setTitles] = useState([]);
@@ -184,6 +186,10 @@ export default function TransactionsTable() {
     function ActionsCell({transactionId}) {
         const handleEditClick = () => {
             console.log(`Edit clicked for transaction ID: ${transactionId}`);
+            const transaction = transactions.find(transaction => transaction.transaction_id_pk === transactionId);
+            setTransactionProps(new TransactionFormProps(transaction));
+            console.log("transaction details sent to EditFormContext");
+            navigate("/EditTransaction");
         };
 
         const handleDeleteClick = () => {

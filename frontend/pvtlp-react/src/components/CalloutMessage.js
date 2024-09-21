@@ -3,13 +3,13 @@ import { Callout } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import PropTypes from 'prop-types';
 
-export function CalloutMessage({ message, visible, setVisibility, calloutColor }) {
+export function CalloutMessage({ message, visible, setVisibility, calloutColor, duration }) {
 
     useEffect(() => {
         if (visible) {
             const timer = setTimeout(() => {
                 setVisibility(false);
-            }, 2000);
+            }, duration);
 
             return () => clearTimeout(timer);
         }

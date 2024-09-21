@@ -74,4 +74,24 @@ export class MFAStatus {
     }
 }
 
+export class TransactionFormProps {
+
+    // constructor that takes Transaction object as argument
+    constructor(transaction) {
+        this.passedTransactionId = transaction.transaction_id_pk;
+        this.passedCustomerId = transaction.customer_id_fk;
+        this.passedAmount = transaction.amount;
+        this.passedCalloutMessage = "Edit transaction form is loaded";
+        this.passedCountryCode = transaction.country_code_fk;
+        this.passedCurrencyCode = transaction.currency_code_fk;
+        this.passedIsCalloutVisible = true;
+        this.passedMfaStatus = transaction.mfa_status_fk;
+        this.passedNumberOfAttempts = transaction.number_of_attempts;
+        this.passedPaymentMethod = transaction.payment_method_fk;
+        this.passedTimestamp = transaction.timestamp;
+        this.passedTransactionStatus = transaction.transaction_status_fk;
+        this.passedTitleId = transaction.title_id_fk;
+    }
+}
+
 export {columns};
