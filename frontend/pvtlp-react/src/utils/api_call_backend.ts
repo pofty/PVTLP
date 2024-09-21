@@ -88,3 +88,17 @@ export async function getJwtToken() {
         console.error("Tokens or idToken is undefined");
     }
 }
+
+export async function updateTransactionCallToBackend(transaction_id: string, data: any) {
+    console.log('updateTransactionCallToBackend called for the table: '+ API_Endpoint.Update_Transaction); // Log to check if function is called
+    let json;
+    try {
+        const response = await apiCallBackend(baseUrl + API_Endpoint.Update_Transaction + '/' + transaction_id, 'PATCH', data);
+        json = JSON.stringify(response);
+        console.log('data retrieved: ', json); // Log to check the transactions
+        return json;
+    } catch (error) {
+        console.error('Failed to fetch and parse Endpoint of: ' + API_Endpoint.Update_Transaction, error);
+        throw error;
+    }
+}

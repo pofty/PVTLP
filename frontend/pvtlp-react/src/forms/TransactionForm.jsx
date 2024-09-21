@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Divider} from "@aws-amplify/ui-react";
 import {Flex, Text, DropdownMenu, Button, Select, Spinner, Badge} from "@radix-ui/themes";
-import {getCallToBackend, postCallToBackend} from '../utils/api_call_backend';
+import {getCallToBackend, postCallToBackend, updateTransactionCallToBackend} from '../utils/api_call_backend';
 import {FlipWords} from "../components/FlipWordsDemo";
 import {AgreementField} from "../components/AgreementField";
 import {TimestampField} from "../components/TimeStampField";
@@ -15,6 +15,8 @@ import {BackgroundGradient} from "../components/background-gradient";
 import {CalloutMessage} from "../components/CalloutMessage";
 import {AsyncSelectField} from "../components/AsyncMenu";
 import {EditFormContext, defaultTransactionFormProps} from "../EditFormContext";
+import {ArrowLeftIcon} from "@radix-ui/react-icons";
+import {useNavigate} from "react-router-dom";
 
 const Form = () => {
     const {transactionProps} = useContext(EditFormContext);
@@ -33,6 +35,7 @@ const Form = () => {
     const [calloutColor, setCalloutColor] = useState("purple");
     const [agreed, setAgreed] = useState(false);
     const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false);
+    const navigate = useNavigate();
 
 
     const loadCustomerOptions = async () => {
@@ -178,6 +181,33 @@ const Form = () => {
         });
     }
 
+    function patchTransaction() {
+        const transaction = {
+            customer_id_fk: customerId,
+            title_id_fk: titleId,
+            country_code_fk: countryCode,
+            currency_code_fk: currencyCode,
+            payment_method_fk: paymentMethod,
+            transaction_status_fk: transactionStatus,
+            amount: amount,
+            timestamp: timestamp,
+            number_of_attempts: numberOfAttempts,
+            mfa_status_fk: mfaStatus
+        };
+
+        console.log("patching transaction: ", transaction);
+        updateTransactionCallToBackend(transactionProps.passedTransactionId, transaction).then(r => {
+            console.log("Transaction patching: ", transactionProps.passedTransactionId );
+            setIsCalloutVisible(true);
+            setCalloutColor("green");
+            setCalloutMessage("Transaction patching successfully, ID: " + transactionProps.passedTransactionId);
+        }).catch(error => {
+            console.error("Error patching transaction: ", error);
+            setIsCalloutVisible(true);
+            setCalloutMessage("Error patching transaction");
+        });
+    }
+
     function SubmitFormButton() {
         const submitButtonText = transactionProps.passedTransactionId ? "Update" : "Submit";
         return (
@@ -190,14 +220,26 @@ const Form = () => {
             </div>
         );
     }
+    function GoBackToTransactionTable() {
+        return (
+            <div className='size-16'>
+                <Button color="gray" variant="outline" highContrast
+                        onClick={() => navigate("/TransactionsPage")}
+                    >
+                    <ArrowLeftIcon/> Go Back to Transaction Table
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <form onSubmit={(e) => {
             e.preventDefault();
-            postTransaction();
+            transactionProps.passedTransactionId ? patchTransaction() : postTransaction();
         }} method="POST" className="shadow-lg mx-auto mt-8 max-w-xl ">
             <BackgroundGradient>
                 <div className="rounded-md grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 p-5 bg-white">
+                    {transactionProps.passedTransactionId ? <GoBackToTransactionTable/> : null}
                     <CalloutMessage message={calloutMessage} visible={isCalloutVisible}
                                     setVisibility={setIsCalloutVisible} calloutColor={calloutColor} duration={2000}/>
 
@@ -213,7 +255,7 @@ const Form = () => {
 
                     <AsyncSelectField fieldName="Customer" loadOptions={loadCustomerOptions} value={customerId}
                                       onChange={setCustomerId} id="customer-idv" fullRow={true}/>
-                    <AsyncSelectField label="Title" loadOptions={loadTitleOptions} value={titleId} onChange={setTitleId}
+                    <AsyncSelectField fieldName="Title" loadOptions={loadTitleOptions} value={titleId} onChange={setTitleId}
                                       id="title-id" fullRow={true}/>
                     <AsyncSelectField fieldName="Country Of transaction" loadOptions={loadCountriesMethodOptions}
                                       value={countryCode} onChange={setCountryCode}

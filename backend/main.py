@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.get_table_from_db import get_table
+from backend.patch_transaction import patch_transaction
 from backend.post_record_to_db import post_transaction
 from backend.delete_record_from_db import delete_record
 from pydantic import BaseModel
@@ -113,3 +114,10 @@ async def delete_transaction(transaction_id: str, jwt_token: str):
         return f"{username} is not authorized to delete a transaction"
     else:
         return delete_record("transaction", transaction_id)
+
+@app.patch("/updatetransaction/{transaction_id}")
+async def update_transaction(transaction_id: str, transaction: Transaction):
+    return patch_transaction(transaction_id, transaction.customer_id_fk, transaction.title_id_fk, transaction.transaction_status_fk,
+                            transaction.payment_method_fk, transaction.country_code_fk, transaction.currency_code_fk,
+                            transaction.timestamp, transaction.number_of_attempts, transaction.mfa_status_fk,
+                            transaction.amount)
