@@ -18,14 +18,17 @@ export function CalloutMessage({ message, visible, setVisibility, calloutColor, 
     if (!visible) return null;
 
     return (
-        <Callout.Root color={calloutColor} className="sm:col-span-2">
-            <Callout.Icon>
-                <InfoCircledIcon />
-            </Callout.Icon>
-            <Callout.Text>
-                {message}
-            </Callout.Text>
-        </Callout.Root>
+        <>
+            <Callout.Root color={calloutColor} className="sm:col-span-2">
+                <Callout.Icon>
+                    <InfoCircledIcon />
+                </Callout.Icon>
+                <Callout.Text>
+                    {message}
+                </Callout.Text>
+            </Callout.Root>
+            <br/>
+        </>
     );
 }
 

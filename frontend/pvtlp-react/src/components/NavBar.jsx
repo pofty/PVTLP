@@ -5,7 +5,7 @@ import pvLogo02 from '../assets/pv-logo2.png';
 import {SignOut} from '../lib/Auth';
 import {useUser} from '../UserContext';
 import {useNavigate} from 'react-router-dom';
-import {Button, Flex} from '@radix-ui/themes';
+import {Button, Flex, AlertDialog} from '@radix-ui/themes';
 
 const navigationItems = [
     {name: 'Transactions', href: '/TransactionsPage'},
@@ -44,6 +44,9 @@ export default function NavBar() {
         return null;
     }
 
+    function exitApp() {
+            window.location.href = 'https://google.com';
+    }
     return (
         <>
             <Disclosure as="nav" className="bg-black">
@@ -90,15 +93,30 @@ export default function NavBar() {
                         <Flex gap="4"
                               className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
 
-                            <Button className="ml-3"
-                                    color="red"
-                                    onClick={() => {
-                                        if (window.confirm('Are you sure you want to exit the app?')) {
-                                            window.location.href = 'https://google.com';
-                                        }
-                                    }}>
-                                Exit App
-                            </Button>
+                            <AlertDialog.Root>
+                                <AlertDialog.Trigger>
+                                    <Button color="red">Exit App</Button>
+                                </AlertDialog.Trigger>
+                                <AlertDialog.Content maxWidth="450px">
+                                    <AlertDialog.Title>Exit App Confirmation Required</AlertDialog.Title>
+                                    <AlertDialog.Description size="2">
+                                        Are you sure? This app will close and be redirected to google.com
+                                    </AlertDialog.Description>
+
+                                    <Flex gap="3" mt="4" justify="end">
+                                        <AlertDialog.Cancel>
+                                            <Button variant="soft" color="gray">
+                                                Cancel
+                                            </Button>
+                                        </AlertDialog.Cancel>
+                                        <AlertDialog.Action>
+                                            <Button variant="solid" color="red" onClick={exitApp}>
+                                                Exit App
+                                            </Button>
+                                        </AlertDialog.Action>
+                                    </Flex>
+                                </AlertDialog.Content>
+                            </AlertDialog.Root>
                             {/* Profile dropdown */}
                             <Menu as="div" className=" relative ml-3 z-[9999]">
                                 <div>

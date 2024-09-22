@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
-import {Flex, IconButton, Button, Badge } from "@radix-ui/themes";
+import {Flex, IconButton, Button, Badge, AlertDialog } from "@radix-ui/themes";
 import {Pencil1Icon as EditIcon, PlusIcon, PersonIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBackend} from "../utils/api_call_backend";
@@ -12,6 +12,7 @@ import {useNavigate} from "react-router-dom";
 import {EditFormContext} from "../EditFormContext";
 import {useUser} from "../UserContext";
 import useAuthRedirect from "../lib/useAuthRedirect";
+import {CalloutMessage} from "../components/CalloutMessage";
 
 export function getCountryCell(value) {
     return (
@@ -46,6 +47,9 @@ export default function TransactionsTable() {
     const [titles, setTitles] = useState([]);
     const [customers, setCustomers] = useState([Customer,]);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isCalloutVisible, setIsCalloutVisible] = useState();
+    const [calloutMessage, setCalloutMessage] = useState();
+    const [calloutColor, setCalloutColor] = useState("green");
     const navigate = useNavigate();
 
     useLayoutEffect(() => {
@@ -131,6 +135,8 @@ export default function TransactionsTable() {
     function CreateTransactionButton() {
         return (
             <div className='size-16'>
+                <CalloutMessage visible={isCalloutVisible} message={calloutMessage} setVisibility={setIsCalloutVisible}
+                                calloutColor={calloutColor} duration={5000}/>
                 <Button color="gray" variant="outline" highContrast
                         onClick={() => navigate("/CreateTransaction")}>
                     <PlusIcon/> Create Transaction
@@ -211,11 +217,46 @@ export default function TransactionsTable() {
                         // rerender the table
                         const tempTransactions = transactions.filter(transaction => transaction.transaction_id_pk !== transactionId);
                         setTransactions(tempTransactions);
+                        setCalloutMessage("transaction ID: " + transactionId + " is successfully deleted");
+                        setCalloutColor("green");
+                        setIsCalloutVisible(true);
                     })
                     .catch((error) => {
                         console.error("Error deleting transaction: ", error);
+                        setCalloutMessage("Error deleting transaction ID: " + transactionId);
+                        setCalloutColor("red");
                     });
 
+            }
+
+            function DeleteButtonWithConfirmation() {
+                return (
+                    <AlertDialog.Root>
+                        <AlertDialog.Trigger>
+                            <IconButton radius="full" color="red" size="1" >
+                        <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
+                    </IconButton>
+                        </AlertDialog.Trigger>
+                        <AlertDialog.Content maxWidth="450px">
+                            <AlertDialog.Title>Delete Confirmation Required</AlertDialog.Title>
+                            <AlertDialog.Description size="2">
+                                Are you sure? This Transaction Record will be permanently deleted.
+                            </AlertDialog.Description>
+                            <Flex gap="3" mt="4" justify="end">
+                                <AlertDialog.Cancel>
+                                    <Button variant="soft" color="gray">
+                                        Cancel
+                                    </Button>
+                                </AlertDialog.Cancel>
+                                <AlertDialog.Action>
+                                   <Button variant="solid" color="red" onClick={handleDeleteClick}>
+                                        Confirm Delete
+                                    </Button>
+                                </AlertDialog.Action>
+                            </Flex>
+                        </AlertDialog.Content>
+                    </AlertDialog.Root>
+                );
             }
 
             return (
@@ -223,9 +264,7 @@ export default function TransactionsTable() {
                     <IconButton radius="full" color="orange" size="1" onClick={handleEditClick}>
                         <EditIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
                     </IconButton>
-                    {isAdmin && <IconButton radius="full" color="red" size="1" onClick={handleDeleteClick}>
-                        <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
-                    </IconButton>}
+                    {isAdmin && <DeleteButtonWithConfirmation/>}
                 </Flex>
             );
         }
