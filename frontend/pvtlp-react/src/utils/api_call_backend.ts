@@ -2,7 +2,7 @@ import axios from 'axios';
 import {fetchAuthSession} from "aws-amplify/auth";
 import {API_Endpoint} from "./api_endpoints";
 
-const baseUrl = 'http://18.132.89.253:8000/';
+const baseUrl = 'https://api.pvtlp.com/';
 
 export const apiCallBackend = async (url: string, method: string, data?: any) => {
     const response = await axios({
