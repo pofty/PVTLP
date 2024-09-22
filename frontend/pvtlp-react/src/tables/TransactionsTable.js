@@ -142,6 +142,7 @@ export default function TransactionsTable() {
 
     if (userName) {
         return (
+
             <BackgroundGradient className="rounded-[22px] sm:p-1 ">
                 <Table
                     topContent={<CreateTransactionButton/>}

@@ -1,4 +1,4 @@
-import React, {createContext} from 'react';
+import React, {createContext, useEffect} from 'react';
 import { Theme } from '@radix-ui/themes';
 import NavBar from "./components/NavBar";
 import TransactionsTable from "./tables/TransactionsTable";
@@ -12,10 +12,10 @@ import TransactionsPage from "./Pages/TransactionsPage";
 import { TransactionFormProps } from './tables/data';
 import {EditFormContext, defaultTransactionFormProps} from './EditFormContext';
 
-
 function App() {
     const [userName, setUserName] = React.useState<string | undefined>(undefined);
     const [transactionProps, setTransactionProps] = React.useState<TransactionFormProps>(defaultTransactionFormProps);
+
 
     return (
         <Theme accentColor="blue">
