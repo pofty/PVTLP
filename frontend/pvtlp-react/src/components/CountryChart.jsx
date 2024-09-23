@@ -56,7 +56,6 @@ export const CountryRecordsChart = () => {
         }
     }, [selectedCountry, chartData]);
 
-
     return (
         <div className="p-5">
                     <Flex className=" rounded-lg shadow-2xl shadow-black" direction={"column"} gap={"2"}>
@@ -76,7 +75,7 @@ export const CountryRecordsChart = () => {
 
                 </div>
 
-            </Flex><ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+            </Flex><ChartContainer config={chartConfig} className="min-h-[200px] w-full p-5 h-[60vh]">
             <BarChart accessibilityLayer data={filteredData}>
                 <CartesianGrid vertical={false}/>
                 <XAxis
@@ -100,6 +99,5 @@ export const CountryRecordsChart = () => {
         </ChartContainer>
         </Flex>
         </div>
-
     );
 };
