@@ -8,9 +8,9 @@ import { FlipWords } from "./components/FlipWordsDemo";
 import Home from "./Pages/Home";
 import AuthPage from "./Pages/AuthPage";
 import { UserProvider } from './UserContext';
-import TransactionsPage from "./Pages/TransactionsPage";
 import { TransactionFormProps } from './tables/data';
 import {EditFormContext, defaultTransactionFormProps} from './EditFormContext';
+import {CountryRecordsChart} from "./components/CountryChart";
 
 function App() {
     const [userName, setUserName] = React.useState<string | undefined>(undefined);
@@ -27,8 +27,9 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Home/>} />
                             <Route path="/CreateTransaction" element={<TransactionForm />} />
-                            <Route path="/TransactionsPage" element={<TransactionsPage />} />
+                            <Route path="/TransactionsPage" element={<TransactionsTable />} />
                             <Route path="/EditTransaction" element={<EditTransactionForm />} />
+                            <Route path="/Metrics" element={<CountryRecordsChart/> } />
                             <Route path="/Auth" element={<AuthPage />} />
                         </Routes>
                     </EditFormContext.Provider>

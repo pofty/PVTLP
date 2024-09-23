@@ -3,7 +3,7 @@ import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Paginat
 import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
 import {Flex, IconButton, Button, Badge, AlertDialog } from "@radix-ui/themes";
-import {Pencil1Icon as EditIcon, PlusIcon, PersonIcon} from "@radix-ui/react-icons";
+import {Pencil1Icon as EditIcon, PlusIcon, PersonIcon, DimensionsIcon, ReloadIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBackend} from "../utils/api_call_backend";
 import Flag from "react-world-flags";
@@ -132,26 +132,35 @@ export default function TransactionsTable() {
         </>;
     }
 
-    function CreateTransactionButton() {
+    function TopContent() {
         return (
-            <div className=' min-w-8'>
+            <>
+            <Flex className=' min-w-8' gap="3" direction={"row"}>
                 <CalloutMessage visible={isCalloutVisible} message={calloutMessage} setVisibility={setIsCalloutVisible}
                                 calloutColor={calloutColor} duration={5000}/>
                 <Button color="gray" variant="outline" highContrast
                         onClick={() => navigate("/CreateTransaction")}>
                     <PlusIcon/> Create Transaction
                 </Button>
-            </div>
+                <Button color="gray" variant="outline" highContrast
+                        onClick={() => navigate("/Metrics")}>
+                    <DimensionsIcon/> Go to Metrics Dashboards
+                </Button>
+                <Button color="gray" variant="outline" highContrast
+                        onClick={() => window.location.reload()}>
+                    <ReloadIcon/> Refresh Page
+                </Button>
+            </Flex>
+            </>
         );
     }
-
 
     if (userName) {
         return (
 
             <BackgroundGradient className="rounded-[22px] sm:p-1 ">
                 <Table
-                    topContent={<CreateTransactionButton/>}
+                    topContent={<TopContent/>}
                     aria-label="Transactions Table"
                     layout="auto"
                     bottomContent={
