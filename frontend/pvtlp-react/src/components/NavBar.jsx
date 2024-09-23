@@ -95,7 +95,7 @@ export default function NavBar() {
 
                             <AlertDialog.Root>
                                 <AlertDialog.Trigger>
-                                    <Button color="red">Exit App</Button>
+                                    <Button color="red" className="px-2">Exit App</Button>
                                 </AlertDialog.Trigger>
                                 <AlertDialog.Content maxWidth="450px">
                                     <AlertDialog.Title>Exit App Confirmation Required</AlertDialog.Title>

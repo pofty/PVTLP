@@ -37,6 +37,7 @@
     "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
     "react-world-flags": "^1.6.0",
+    "recharts": "^2.12.7",
     "tailwind-merge": "^2.5.2",
     "three": "^0.168.0",
     "three-globe": "^2.31.1",

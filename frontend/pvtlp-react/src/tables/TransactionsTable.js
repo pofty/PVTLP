@@ -134,7 +134,7 @@ export default function TransactionsTable() {
 
     function CreateTransactionButton() {
         return (
-            <div className='size-16'>
+            <div className=' min-w-8'>
                 <CalloutMessage visible={isCalloutVisible} message={calloutMessage} setVisibility={setIsCalloutVisible}
                                 calloutColor={calloutColor} duration={5000}/>
                 <Button color="gray" variant="outline" highContrast

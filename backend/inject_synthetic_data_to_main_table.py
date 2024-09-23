@@ -1,16 +1,15 @@
 from sqlalchemy import create_engine, MetaData, select
 from sqlalchemy.sql import insert
 import random
-from create_db_schemas import customer, title, \
-    transaction
-from backend.db_auth_cred import connection_string
+from create_db_schemas import customer, title, transaction
+from db_auth_cred import connection_string
 
 # Create an engine
 engine = create_engine(connection_string)
-connection = engine.connect()
 
 # Initialize metadata
 metadata = MetaData()
+metadata.reflect(bind=engine)
 
 def get_random_customer_id(connection):
     customer_ids = connection.execute(select(customer.c.customer_id_pk)).fetchall()
@@ -20,13 +19,9 @@ def get_random_title_id(connection):
     title_ids = connection.execute(select(title.c.title_id_pk)).fetchall()
     return random.choice(title_ids)[0]
 
-
-# Connect to the database
-with (connection):
-    random_customer_id = get_random_customer_id(connection)
-
+with engine.connect() as connection:
     # Insert records
-    insert_stmt = [insert(transaction).values([
+    insert_stmt = transaction.insert().values([
         {
             'transaction_status_fk': 'Failed',
             'payment_method_fk': 'Debit Card',
@@ -183,12 +178,37 @@ with (connection):
             'mfa_status_fk': 'Failed',
             'country_code_fk': 'USA'
         }
-    ])]
+    ])
 
+    # List of possible values for transaction_status_fk
+    transaction_statuses = ['Failed', 'Successful']
+
+    # List of random countries
+    countries = ['USA', 'CAN', 'GBR', 'AUS', 'IND', 'BRA', 'JPN', 'DEU', 'FRA', 'ITA']
+
+    # Generate additional random transactions
+    additional_transactions = [
+        {
+            'transaction_status_fk': random.choice(transaction_statuses),
+            'payment_method_fk': random.choice(
+                ['Credit Card', 'Debit Card', 'PayPal', 'Bank Transfer', 'Cash', 'Gift Card']),
+            'customer_id_fk': get_random_customer_id(connection),
+            'amount': random.uniform(10, 35),
+            'currency_code_fk': random.choice(['USD', 'CAD', 'GBP', 'AUD', 'INR', 'BRL', 'JPY', 'EUR', 'CHF', 'CNY']),
+            'timestamp': f'2020-{random.randint(1, 12):02d}-{random.randint(1, 28):02d} {random.randint(0, 23):02d}:{random.randint(0, 59):02d}:00',
+            'number_of_attempts': random.randint(1, 10),
+            'title_id_fk': get_random_title_id(connection),
+            'mfa_status_fk': random.choice(['Successful', 'Failed', 'Exempted', 'Grandfathered']),
+            'country_code_fk': random.choice(countries)
+        }
+        for _ in range(10)
+    ]
+
+    # Add the additional transactions to the insert statement
+    insert_stmt = insert_stmt.values(additional_transactions)
 
     # Execute the insert statement
-    for stmt in insert_stmt:
-        connection.execute(stmt)
+    connection.execute(insert_stmt)
     connection.commit()
 
 print("Records inserted successfully!")
