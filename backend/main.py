@@ -1,28 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.get_table_from_db import get_table
-from backend.patch_transaction import patch_transaction
-from backend.post_record_to_db import post_transaction
-from backend.delete_record_from_db import delete_record
+from backend.db_utilities.get_table_from_db import get_table
+from backend.db_utilities.patch_transaction import patch_transaction
+from backend.db_utilities.post_record_to_db import post_transaction
+from backend.db_utilities.delete_record_from_db import delete_record
 from pydantic import BaseModel
-import backend.jwt_handling as jwt_handling
-import backend.user_auth as user_auth
+import backend.utilities.jwt_handling as jwt_handling
+import backend.utilities.user_auth as user_auth
 
 app = FastAPI()
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-    "*"
-]
-
+# all origins are allowed to access the API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this to the specific domains for better security
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Adjust methods as necessary
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -103,8 +96,6 @@ async def post_transactions(transaction: Transaction):
 
 @app.delete("/deletetransaction/{transaction_id}")
 async def delete_transaction(transaction_id: str, jwt_token: str):
-    #print("JWT token is: ", jwt_token)
-    # TODO: check jwt format validity
     decoded_token = jwt_handling.decode_jwt_token(jwt_token)
     print("Decoded token is: ", decoded_token)
     username = decoded_token["cognito:username"]
@@ -118,6 +109,6 @@ async def delete_transaction(transaction_id: str, jwt_token: str):
 @app.patch("/updatetransaction/{transaction_id}")
 async def update_transaction(transaction_id: str, transaction: Transaction):
     return patch_transaction(transaction_id, transaction.customer_id_fk, transaction.title_id_fk, transaction.transaction_status_fk,
-                            transaction.payment_method_fk, transaction.country_code_fk, transaction.currency_code_fk,
-                            transaction.timestamp, transaction.number_of_attempts, transaction.mfa_status_fk,
-                            transaction.amount)
+                             transaction.payment_method_fk, transaction.country_code_fk, transaction.currency_code_fk,
+                             transaction.timestamp, transaction.number_of_attempts, transaction.mfa_status_fk,
+                             transaction.amount)

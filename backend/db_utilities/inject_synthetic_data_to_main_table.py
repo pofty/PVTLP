@@ -1,16 +1,10 @@
-from sqlalchemy import create_engine, MetaData, select
+from sqlalchemy import select
 from sqlalchemy.sql import insert
 import random
-from create_db_schemas import customer, title, \
+from backend.db_utilities.create_db_schemas import customer, title, \
     transaction
-from backend.db_auth_cred import connection_string
+from backend.db_utilities.global_db_variables import connection
 
-# Create an engine
-engine = create_engine(connection_string)
-connection = engine.connect()
-
-# Initialize metadata
-metadata = MetaData()
 
 def get_random_customer_id(connection):
     customer_ids = connection.execute(select(customer.c.customer_id_pk)).fetchall()
@@ -25,8 +19,7 @@ def get_random_title_id(connection):
 with (connection):
     random_customer_id = get_random_customer_id(connection)
 
-    # Insert records
-    insert_stmt = [insert(transaction).values([
+    insert_array = [insert(transaction).values([
         {
             'transaction_status_fk': 'Failed',
             'payment_method_fk': 'Debit Card',
@@ -187,7 +180,7 @@ with (connection):
 
 
     # Execute the insert statement
-    for stmt in insert_stmt:
+    for stmt in insert_array:
         connection.execute(stmt)
     connection.commit()
 

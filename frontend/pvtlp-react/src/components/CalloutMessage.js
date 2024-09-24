@@ -19,7 +19,7 @@ export function CalloutMessage({ message, visible, setVisibility, calloutColor, 
 
     return (
         <>
-            <Callout.Root color={calloutColor} className="sm:col-span-2">
+            <Callout.Root color={calloutColor} className="sm:col-span-2 p-3">
                 <Callout.Icon>
                     <InfoCircledIcon />
                 </Callout.Icon>
@@ -27,7 +27,6 @@ export function CalloutMessage({ message, visible, setVisibility, calloutColor, 
                     {message}
                 </Callout.Text>
             </Callout.Root>
-            <br/>
         </>
     );
 }

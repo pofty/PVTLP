@@ -224,7 +224,7 @@ const Form = () => {
     }
     function GoBackToTransactionTable() {
         return (
-            <div className='size-16'>
+            <div >
                 <Button color="gray" variant="outline" highContrast
                         onClick={() => navigate("/TransactionsPage")}
                     >
@@ -244,7 +244,6 @@ const Form = () => {
                     {transactionProps.passedTransactionId ? <GoBackToTransactionTable/> : null}
                     <CalloutMessage message={calloutMessage} visible={isCalloutVisible}
                                     setVisibility={setIsCalloutVisible} calloutColor={calloutColor} duration={2000}/>
-
                     {transactionProps.passedTransactionId ? (
                         <CalloutMessage
                             message={"Editing Transaction id: " + transactionProps.passedTransactionId}
@@ -254,7 +253,6 @@ const Form = () => {
                             duration={0}
                         />
                     ) : null}
-
                     <AsyncSelectField fieldName="Customer" loadOptions={loadCustomerOptions} value={customerId}
                                       onChange={setCustomerId} id="customer-idv" fullRow={true}/>
                     <AsyncSelectField fieldName="Title" loadOptions={loadTitleOptions} value={titleId} onChange={setTitleId}

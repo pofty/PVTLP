@@ -134,22 +134,24 @@ export default function TransactionsTable() {
     function TopContent() {
         return (
             <>
-            <Flex className=' min-w-8' gap="3" direction={"row"}>
-                <CalloutMessage visible={isCalloutVisible} message={calloutMessage} setVisibility={setIsCalloutVisible}
-                                calloutColor={calloutColor} duration={5000}/>
-                <Button color="gray" variant="outline" highContrast
-                        onClick={() => navigate("/CreateTransaction")}>
-                    <PlusIcon/> Create Transaction
-                </Button>
-                <Button color="gray" variant="outline" highContrast
-                        onClick={() => navigate("/Metrics")}>
-                    <DimensionsIcon/> Go to Metrics Dashboards
-                </Button>
-                <Button color="gray" variant="outline" highContrast
-                        onClick={() => window.location.reload()}>
-                    <ReloadIcon/> Refresh Page
-                </Button>
-            </Flex>
+                <Flex  direction={"column"}>
+                    <CalloutMessage visible={isCalloutVisible} message={calloutMessage} setVisibility={setIsCalloutVisible}
+                                    calloutColor={calloutColor} duration={5000}/>
+                    <Flex className=' min-w-8' gap="3" direction={"row"}>
+                        <Button color="gray" variant="outline" highContrast
+                                onClick={() => navigate("/CreateTransaction")}>
+                            <PlusIcon/> Create Transaction
+                        </Button>
+                        <Button color="gray" variant="outline" highContrast
+                                onClick={() => navigate("/Metrics")}>
+                            <DimensionsIcon/> Go to Metrics Dashboards
+                        </Button>
+                        <Button color="gray" variant="outline" highContrast
+                                onClick={() => window.location.reload()}>
+                            <ReloadIcon/> Refresh Page
+                        </Button>
+                    </Flex>
+                </Flex>
             </>
         );
     }
@@ -242,8 +244,8 @@ export default function TransactionsTable() {
                     <AlertDialog.Root>
                         <AlertDialog.Trigger>
                             <IconButton radius="full" color="red" size="1" >
-                        <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
-                    </IconButton>
+                                <TrashIcon className="h-6 w-4 text-white hover:scale-125 transition-transform duration-200"/>
+                            </IconButton>
                         </AlertDialog.Trigger>
                         <AlertDialog.Content maxWidth="450px">
                             <AlertDialog.Title>Delete Confirmation Required</AlertDialog.Title>
@@ -257,7 +259,7 @@ export default function TransactionsTable() {
                                     </Button>
                                 </AlertDialog.Cancel>
                                 <AlertDialog.Action>
-                                   <Button variant="solid" color="red" onClick={handleDeleteClick}>
+                                    <Button variant="solid" color="red" onClick={handleDeleteClick}>
                                         Confirm Delete
                                     </Button>
                                 </AlertDialog.Action>

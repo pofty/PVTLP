@@ -1,9 +1,5 @@
-from sqlalchemy import create_engine, MetaData, Table, delete
-from backend.db_auth_cred import connection_string
-
-# Create an engine and initialize metadata
-engine = create_engine(connection_string)
-metadata = MetaData()
+from sqlalchemy import Table, delete
+from backend.db_utilities.global_db_variables import metadata, engine
 
 def delete_record(table_name, primary_key):
     table = Table(table_name, metadata, autoload_with=engine)

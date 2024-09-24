@@ -1,14 +1,6 @@
-from sqlalchemy import create_engine, MetaData, select
 from sqlalchemy.sql import insert
-from backend.create_db_schemas import transaction
-from backend.db_auth_cred import connection_string
-
-# Create an engine
-engine = create_engine(connection_string)
-connection = engine.connect()
-
-# Initialize metadata
-metadata = MetaData()
+from backend.db_utilities.create_db_schemas import transaction
+from backend.db_utilities.global_db_variables import connection
 
 def post_transaction(customer_id_fk: str, title_id_fk: str, transaction_status_fk: str, payment_method_fk: str,
                      country_code_fk: str, currency_code_fk: str, timestamp: str, number_of_attempts: int,

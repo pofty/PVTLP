@@ -1,14 +1,10 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, ForeignKey
+from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy import Text, Boolean, SmallInteger, UUID, TIMESTAMP, CHAR, VARCHAR
 import uuid
-from backend.db_auth_cred import connection_string
+from backend.db_utilities.global_db_variables import engine, metadata
 
-engine = create_engine(connection_string)
-
-# Initialize metadata
-metadata = MetaData()
-
-# Define the tables with all fields marked as not null
+# all field as not nullable, and UUIDs are generated automatically,
+# thus APIs will not need to provide them
 transaction_status = Table(
     'transaction_status', metadata,
     Column('status_name_pk', VARCHAR(20), primary_key=True, nullable=False)

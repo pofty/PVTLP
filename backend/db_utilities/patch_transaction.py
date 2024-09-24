@@ -1,13 +1,6 @@
-from sqlalchemy import create_engine, MetaData, update
-from backend.create_db_schemas import transaction
-from backend.db_auth_cred import connection_string
-
-# Create an engine
-engine = create_engine(connection_string)
-connection = engine.connect()
-
-# Initialize metadata
-metadata = MetaData()
+from sqlalchemy import update
+from backend.db_utilities.create_db_schemas import transaction
+from backend.db_utilities.global_db_variables import connection
 
 def patch_transaction(transaction_id_pk: str, customer_id_fk: str, title_id_fk: str, transaction_status_fk: str, payment_method_fk: str,
                      country_code_fk: str, currency_code_fk: str, timestamp: str, number_of_attempts: int,
@@ -28,4 +21,4 @@ def patch_transaction(transaction_id_pk: str, customer_id_fk: str, title_id_fk: 
     connection.commit()
     return result.rowcount
 
-print("Records updated successfully!")
+#print("Records updated successfully!")
