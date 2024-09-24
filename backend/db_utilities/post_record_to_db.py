@@ -23,4 +23,4 @@ def post_transaction(customer_id_fk: str, title_id_fk: str, transaction_status_f
     return result.inserted_primary_key[0]
 
 
-print("Records inserted successfully!")
+#print("Records inserted successfully!")
