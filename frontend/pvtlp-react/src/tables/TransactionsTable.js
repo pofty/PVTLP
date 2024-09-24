@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
-import {Flex, IconButton, Button, Badge, AlertDialog } from "@radix-ui/themes";
+import {Flex, IconButton, Button, Badge, AlertDialog, Text } from "@radix-ui/themes";
 import {Pencil1Icon as EditIcon, PlusIcon, PersonIcon, DimensionsIcon, ReloadIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBackend} from "../utils/api_call_backend";
@@ -18,7 +18,6 @@ export function getCountryCell(value) {
     return (
         <Flex justify={"center"}>
             <Flag className="rounded border-1 " code={value} height="10" width="35"/>
-
         </Flex>
     );
 }
