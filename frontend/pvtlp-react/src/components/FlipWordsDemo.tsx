@@ -1,8 +1,12 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, LayoutGroup } from "framer-motion";
 import { cn } from "../lib/utils";
 
+/*
+    * this is an external component
+    * @link https://ui.aceternity.com/components/flip-words
+ */
 export const FlipWords = ({
   words,
   duration = 3000,

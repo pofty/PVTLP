@@ -1,13 +1,12 @@
-import React, {useState, useEffect, useContext, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Divider} from "@aws-amplify/ui-react";
-import {Flex, Text, DropdownMenu, Button, Select, Spinner, Badge} from "@radix-ui/themes";
+import {Flex, Text, DropdownMenu, Button, Spinner} from "@radix-ui/themes";
 import {getCallToBackend, postCallToBackend, updateTransactionCallToBackend} from '../utils/api_call_backend';
 import {FlipWords} from "../components/FlipWordsDemo";
 import {AgreementField} from "../components/AgreementField";
 import {TimestampField} from "../components/TimeStampField";
 import {NumberField} from "../components/AmoutField";
-import {SubmitButton} from "../components/SubmitButton";
 import {Country, Currency, Customer, MFAStatus, PaymentMethod, Title, TransactionStatus} from "../tables/data";
 import {API_Endpoint} from "../utils/api_endpoints";
 import {getCountryCell} from "../components/CoutryFlag";
@@ -20,6 +19,11 @@ import {useNavigate} from "react-router-dom";
 import {useUser} from "../UserContext";
 import useAuthRedirect from "../lib/useAuthRedirect";
 
+/*
+    * This is the main form component for the transaction form.
+    * It is used to create a new transaction or edit an existing transaction.
+    * It uses the EditFormContext to get the transaction props, which is a share context in App.tsx level.
+ */
 const Form = () => {
     const {transactionProps} = useContext(EditFormContext);
     const [customerId, setCustomerId] = useState(transactionProps.passedCustomerId);
@@ -39,44 +43,63 @@ const Form = () => {
     const [isSubmitButtonEnabled, setIsSubmitButton] = useState(false);
     const navigate = useNavigate();
 
+    function showCallout(message, color) {
+        setCalloutMessage(message);
+        setCalloutColor(color);
+        setIsCalloutVisible(true);
+    }
+
 
     const loadCustomerOptions = async () => {
-        const customers = await getCallToBackend(API_Endpoint.Customers, Customer);
-        return customers.map((customer) => ({
-            value: customer.customer_id_pk,
-            label: (
-                <>
-                    <Flex direction="column">
-                        <Text size="2" weight="bold">
-                            {customer.first_name} {customer.last_name}
-                        </Text>
-                        <Text color="gray" size="1">
-                            Customer Id: {customer.customer_id_pk}    </Text>
-                    </Flex>
-                </>
-            )
-        }));
+        try {
+            const customers = await getCallToBackend(API_Endpoint.Customers, Customer);
+            return customers.map((customer) => ({
+                value: customer.customer_id_pk,
+                label: (
+                    <>
+                        <Flex direction="column">
+                            <Text size="2" weight="bold">
+                                {customer.first_name} {customer.last_name}
+                            </Text>
+                            <Text color="gray" size="1">
+                                Customer Id: {customer.customer_id_pk}
+                            </Text>
+                        </Flex>
+                    </>
+                )
+            }));
+        } catch (error) {
+            console.error("Error fetching customers: ", error);
+            showCallout("Error fetching customers", "red");
+            return [];
+        }
     };
 
     const loadTitleOptions = async () => {
-        const titles = await getCallToBackend("titles", Title);
-        return titles.map((title) => ({
-            value: title.title_id_pk,
-            label: (
-                <>
-                    <Flex direction="column">
-                        <Text size="2" weight="bold">
-                            {title.name}
-                        </Text>
-                        <Text color="gray" size="1">
-                            Title Id: {title.title_id_pk}
-                        </Text>
-                    </Flex>
-
-                </>
-            )
-        }));
+        try {
+            const titles = await getCallToBackend("titles", Title);
+            return titles.map((title) => ({
+                value: title.title_id_pk,
+                label: (
+                    <>
+                        <Flex direction="column">
+                            <Text size="2" weight="bold">
+                                {title.name}
+                            </Text>
+                            <Text color="gray" size="1">
+                                Title Id: {title.title_id_pk}
+                            </Text>
+                        </Flex>
+                    </>
+                )
+            }));
+        } catch (error) {
+            console.error("Error fetching titles: ", error);
+            showCallout("Error fetching titles", "red");
+            return [];
+        }
     };
+
     const loadPaymentMethodOptions = async () => {
         try {
             const paymentMethods = await getCallToBackend(API_Endpoint.Payment_Methods, PaymentMethod);
@@ -87,6 +110,7 @@ const Form = () => {
             }));
         } catch (error) {
             console.error("Error fetching payment methods: ", error);
+            showCallout("Error fetching payment methods", "red");
             return [];
         }
     }
@@ -106,6 +130,7 @@ const Form = () => {
             }));
         } catch (error) {
             console.error("Error fetching countries: ", error);
+            showCallout("Error fetching countries", "red");
             return [];
         }
     }
@@ -119,6 +144,7 @@ const Form = () => {
             }));
         } catch (error) {
             console.error("Error fetching currencies: ", error);
+            showCallout("Error fetching currencies", "red");
             return [];
         }
     }
@@ -130,6 +156,7 @@ const Form = () => {
             return mfaStatuses
         } catch (error) {
             console.error("Error fetching MFA statuses: ", error);
+            showCallout("Error fetching MFA statuses", "red");
             return [];
         }
     };
@@ -140,6 +167,7 @@ const Form = () => {
             return transactionStatuses;
         } catch (error) {
             console.error("Error fetching transaction statuses: ", error);
+            showCallout("Error fetching transaction statuses", "red");
             return [];
         }
     }
@@ -179,6 +207,7 @@ const Form = () => {
         }).catch(error => {
             console.error("Error posting transaction: ", error);
             setIsCalloutVisible(true);
+            setCalloutColor("red");
             setCalloutMessage("Error posting transaction");
         });
     }
@@ -226,8 +255,7 @@ const Form = () => {
         return (
             <div >
                 <Button color="gray" variant="outline" highContrast
-                        onClick={() => navigate("/TransactionsPage")}
-                    >
+                        onClick={() => navigate("/TransactionsPage")}>
                     <ArrowLeftIcon/> Go Back to Transaction Table
                 </Button>
             </div>
@@ -266,7 +294,7 @@ const Form = () => {
                     <AsyncSelectField fieldName="Payment Method" loadOptions={loadPaymentMethodOptions}
                                       value={paymentMethod} onChange={setPaymentMethod}
                                       id="payment-method"/>
-                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={1} max={200}
+                    <NumberField fieldName={"Amount"} number={amount} setNumber={setAmount} min={0} max={200}
                                  setCalloutVisibility={setIsCalloutVisible} setCalloutMessage={setCalloutMessage}
                                  setCalloutColor={setCalloutColor}/>
                     <DropDownSelectMenu fieldName="MFA Status" loadOptions={loadMfaStatusOptions} value={mfaStatus}
@@ -400,5 +428,3 @@ function DropDownSelectMenu({fieldName, loadOptions, value, onChange, id}) {
         </div>
     );
 }
-
-export default TransactionForm;

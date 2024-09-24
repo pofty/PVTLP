@@ -5,8 +5,8 @@ from backend.db_utilities.patch_transaction import patch_transaction
 from backend.db_utilities.post_record_to_db import post_transaction
 from backend.db_utilities.delete_record_from_db import delete_record
 from pydantic import BaseModel
-import backend.utilities.jwt_handling as jwt_handling
-import backend.utilities.user_auth as user_auth
+from backend.utilities.jwt_handling import decode_jwt_token, get_username_from_jwt
+from backend.utilities.user_auth import is_admin, is_logged_in
 
 app = FastAPI()
 
@@ -26,7 +26,9 @@ async def root():
 
 
 @app.get("/transactions")
-async def get_transactions():
+async def get_transactions(jwt_token: str):
+    if not is_logged_in(jwt_token):
+        return "User is not logged in"
     return get_table("transaction")
 
 
@@ -79,9 +81,9 @@ class Transaction(BaseModel):
 
 @app.get("/isadmin")
 async def is_admin(jwt_token: str):
-    decoded_token = jwt_handling.decode_jwt_token(jwt_token)
+    decoded_token = decode_jwt_token(jwt_token)
     username = decoded_token["cognito:username"]
-    return user_auth.is_admin(username)
+    return is_admin(username)
 
 # Post APIs
 @app.post("/createtransaction")
@@ -96,12 +98,9 @@ async def post_transactions(transaction: Transaction):
 
 @app.delete("/deletetransaction/{transaction_id}")
 async def delete_transaction(transaction_id: str, jwt_token: str):
-    decoded_token = jwt_handling.decode_jwt_token(jwt_token)
-    print("Decoded token is: ", decoded_token)
-    username = decoded_token["cognito:username"]
-    print("Username is: ", username)
-    is_admin = user_auth.is_admin(username)
-    if not is_admin:
+    decoded_token = decode_jwt_token(jwt_token)
+    username = get_username_from_jwt(decoded_token)
+    if not is_admin(username):
         return f"{username} is not authorized to delete a transaction"
     else:
         return delete_record("transaction", transaction_id)

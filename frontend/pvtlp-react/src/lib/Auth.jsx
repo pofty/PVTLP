@@ -6,7 +6,11 @@ import { Button } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
 
-
+/*
+    * Auth component is used to authenticate the user and set the username in the UserContext.
+    * SignOut component is used to sign out the user and set the username to undefined in the UserContext.
+    * Both components use the Authenticator and useAuthenticator hooks from the AWS Amplify library.
+ */
 export default function Auth() {
     const { setUserName } = useUser();
     const navigate = useNavigate();

@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 import {columns, Customer, Title, Transaction, TransactionFormProps} from "./data";
 import {BackgroundGradient} from "../components/background-gradient";
-import {Flex, IconButton, Button, Badge, AlertDialog, Text } from "@radix-ui/themes";
+import {Flex, IconButton, Button, Badge, AlertDialog} from "@radix-ui/themes";
 import {Pencil1Icon as EditIcon, PlusIcon, PersonIcon, DimensionsIcon, ReloadIcon} from "@radix-ui/react-icons";
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {getCallToBackend, deleteCallToBackend, getJwtToken, isAdminGetCallToBackend} from "../utils/api_call_backend";
@@ -96,6 +96,7 @@ export default function TransactionsTable() {
             <Flex direction={"column"} align={"center"}>
                 <Flex direction={'row'} justify={'center'}>
                     <PersonIcon/>
+                    // this to make sure the name is not broken into two lines, equivalent to &nbsp;
                     <span>{`${customer.first_name}\u00A0${customer.last_name}`}</span> </Flex>
                 <div className="text-gray-500"> Home Region: {customer.home_country_code_fk}</div>
                 <div className="text-gray-500"> ID: {customer.customer_id_pk}</div>

@@ -2,6 +2,10 @@ import { cn } from "../lib/utils";
 import React from "react";
 import { motion } from "framer-motion";
 
+/*
+    * this is an external component and then personalised
+    * @link https://ui.aceternity.com/components/background-gradient
+ */
 export const BackgroundGradient = ({
   children,
   className,
