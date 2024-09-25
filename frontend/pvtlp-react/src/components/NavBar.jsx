@@ -117,7 +117,6 @@ export default function NavBar() {
                                     </Flex>
                                 </AlertDialog.Content>
                             </AlertDialog.Root>
-                            {/* Profile dropdown */}
                             <Menu as="div" className=" relative ml-3 z-[9999]">
                                 <div>
                                     <MenuButton

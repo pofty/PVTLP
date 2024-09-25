@@ -176,7 +176,7 @@ const Form = () => {
     }, [customerId, titleId, countryCode, currencyCode, paymentMethod, mfaStatus, transactionStatus, amount, timestamp, agreed]);
 
     function validateForm() {
-        if (customerId && titleId && countryCode && currencyCode && paymentMethod && mfaStatus && transactionStatus && amount && timestamp && agreed) {
+        if (customerId && titleId && countryCode && currencyCode && paymentMethod && mfaStatus && transactionStatus && (amount) && timestamp && agreed) {
             setIsSubmitButton(true);
             console.log("all set")
         } else {
