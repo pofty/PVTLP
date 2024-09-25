@@ -104,23 +104,23 @@ const averageSuccessfulTransactions = chartData.reduce((sum, data) => sum + data
                      radius={4}/>
 <ReferenceLine
     y={averageAllTransactions}
+     // for text
     label={{
-        value: `Avg All Transactions: ${averageAllTransactions.toFixed(2)}`,
+        position: 'left',
+        value: `Avg: ${averageAllTransactions.toFixed(2)}`,
         fill: 'black',
-        background: { fill: 'white', stroke: 'white', strokeWidth: 1, radius: 3 }
     }}
-    stroke="white"
-    strokeDasharray="3 3"
+    // for line
+    stroke="black"
 />
 <ReferenceLine
     y={averageSuccessfulTransactions}
     label={{
-        value: `Avg Successful Transactions: ${averageSuccessfulTransactions.toFixed(2)}`,
-        fill: 'white',
-        background: 'black',
+        position: 'left',
+        value: `Avg: ${averageSuccessfulTransactions.toFixed(2)}`,
+        fill: 'blue',
     }}
-    stroke="white"
-    strokeDasharray="3 3"
+    stroke="Blue"
 />
             </BarChart>
         </ChartContainer>

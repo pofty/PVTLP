@@ -9,6 +9,7 @@ import {Button, Flex, AlertDialog} from '@radix-ui/themes';
 
 const navigationItems = [
     {name: 'Transactions', href: '/TransactionsPage'},
+    {name: 'Metrics', href: '/Metrics'},
 ];
 
 function classNames(...classes) {
