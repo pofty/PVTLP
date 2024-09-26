@@ -382,3 +382,6 @@ cython_debug/
 
 # IDE - JetBrains IntelliJ & VSCode
 out/!/frontend/ssl/
+/frontend/pvtlp-react/src/src/
+/frontend/pvtlp-react/src/amplify/
+/frontend/ssl/

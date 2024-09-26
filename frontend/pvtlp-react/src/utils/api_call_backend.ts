@@ -35,8 +35,9 @@ export const isAdminGetCallToBackend = async () => {
 export const getCallToBackend = async (apiEndPoint: string, dataType: any) => {
     console.log('getCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
     let json;
+    const jwtToken = await getJwtToken();
     try {
-        const response = await apiCallBackend(baseUrl + apiEndPoint, 'GET');
+        const response = await apiCallBackend(baseUrl + apiEndPoint + '?jwt_token=' + jwtToken, 'GET');
         json = JSON.stringify(response);
         let retrievedData: typeof dataType[] = JSON.parse(json);
         console.log('data retrieved: ', retrievedData); // Log to check the transactions
@@ -50,8 +51,9 @@ export const getCallToBackend = async (apiEndPoint: string, dataType: any) => {
 export const postCallToBackend = async (apiEndPoint: string, data: any) => {
     console.log('postCallToBackend called for the table: '+ apiEndPoint); // Log to check if function is called
     let json;
+    const jwtToken = await getJwtToken();
     try {
-        const response = await apiCallBackend(baseUrl + apiEndPoint, 'POST', data);
+        const response = await apiCallBackend(baseUrl + apiEndPoint + '?jwt_token=' + jwtToken , 'POST', data);
         json = JSON.stringify(response);
         console.log('data retrieved: ', json); // Log to check the transactions
         return json;
@@ -92,8 +94,9 @@ export async function getJwtToken() {
 export async function updateTransactionCallToBackend(transaction_id: string, data: any) {
     console.log('updateTransactionCallToBackend called for the table: '+ API_Endpoint.Update_Transaction); // Log to check if function is called
     let json;
+    const jwtToken = await getJwtToken();
     try {
-        const response = await apiCallBackend(baseUrl + API_Endpoint.Update_Transaction + '/' + transaction_id, 'PATCH', data);
+        const response = await apiCallBackend(baseUrl + API_Endpoint.Update_Transaction + '/' + transaction_id + '?jwt_token=' + jwtToken, 'PATCH', data);
         json = JSON.stringify(response);
         console.log('data retrieved: ', json); // Log to check the transactions
         return json;

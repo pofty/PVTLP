@@ -11,7 +11,7 @@ def prepare_data():
     global transaction_data_record_transaction_id
 
     # get transaction from the database
-    response = client.get("/transactions")
+    response = client.get(f"/transactions?jwt_token={jwt_test_token}")
     transactions = response.json()
     transaction_data_record = transactions[0] # get the first transaction
     # remove the transaction_id_pk key and value
@@ -26,70 +26,62 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.json(), {"message": "Hello World"})
 
     def test_get_transactions(self):
-        response = client.get("/transactions")
+        response = client.get(f"/transactions?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
 
     def test_get_customers(self):
-        response = client.get("/customers")
+        response = client.get(f"/customers?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get("/titles")
+    def test_get_titles(self):
+        response = client.get(f"/titles?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_get_countries(self):
-        response = client.get("/countries")
+        response = client.get(f"/countries?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_get_currencies(self):
-        response = client.get("/currencies")
+        response = client.get(f"/currencies?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_get_payment_methods(self):
-        response = client.get("/payment_methods")
+        response = client.get(f"/payment_methods?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_get_transaction_statuses(self):
-        response = client.get("/transaction_statuses")
+        response = client.get(f"/transaction_statuses?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_get_mfa_statuses(self):
-        response = client.get("/mfa_statuses")
+        response = client.get(f"/mfa_statuses?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_is_admin(self):
         response = client.get(f"/isadmin?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
         # check response is true
+        print("is admin respoinse" + str(response.json()))
         self.assertEqual(response.json(), True)
-        
 
     def test_is_admin_no_token_expect_error(self):
         response = client.get(f"/isadmin")
         self.assertEqual(response.status_code, 422)
-        
 
     def unknown_endpoint(self):
         response = client.get("/unknown")
         self.assertEqual(response.status_code, 404)
-        
 
     def test_post_transactions(self):
-        response = client.post("/createtransaction", json=transaction_data_record)
+        response = client.post(f"/createtransaction?jwt_token={jwt_test_token}", json=transaction_data_record)
         self.assertEqual(response.status_code, 200)
 
     def test_delete_transaction(self):
         response = client.delete(f"/deletetransaction/{transaction_data_record_transaction_id}?jwt_token={jwt_test_token}")
         self.assertEqual(response.status_code, 200)
-        
 
     def test_update_transaction(self):
-        response = client.patch(f"/updatetransaction/{transaction_data_record_transaction_id}", json=transaction_data_record)
+        response = client.patch(f"/updatetransaction/{transaction_data_record_transaction_id}?jwt_token={jwt_test_token}", json=transaction_data_record)
         self.assertEqual(response.status_code, 200)
 
 
